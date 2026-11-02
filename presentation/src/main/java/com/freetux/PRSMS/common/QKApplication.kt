@@ -30,6 +30,8 @@ import com.freetux.PRSMS.common.util.CrashlyticsTree
 import com.freetux.PRSMS.common.util.FileLoggingTree
 import com.freetux.PRSMS.injection.AppComponentManager
 import com.freetux.PRSMS.injection.appComponent
+import com.freetux.PRSMS.receiver.AutomaticBackupScheduler
+import com.freetux.PRSMS.util.Preferences
 import com.freetux.PRSMS.manager.AnalyticsManager
 import com.freetux.PRSMS.manager.BillingManager
 import com.freetux.PRSMS.manager.ReferralManager
@@ -69,6 +71,7 @@ class QKApplication : Application(), HasActivityInjector, HasBroadcastReceiverIn
     @Inject lateinit var nightModeManager: NightModeManager
     @Inject lateinit var realmMigration: QkRealmMigration
     @Inject lateinit var referralManager: ReferralManager
+    @Inject lateinit var preferences: Preferences
 
     override fun onCreate() {
         super.onCreate()
@@ -84,6 +87,7 @@ class QKApplication : Application(), HasActivityInjector, HasBroadcastReceiverIn
                 .build())
 
         qkMigration.performMigration()
+        AutomaticBackupScheduler.schedule(this, preferences.automaticBackup.get())
 
         GlobalScope.launch(Dispatchers.IO) {
             referralManager.trackReferrer()
