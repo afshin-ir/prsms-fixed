@@ -94,7 +94,7 @@ class ConversationInfoAdapter @Inject constructor(
             }
 
             is ConversationInfoSettings -> {
-                // Keep the custom conversation title available for individual senders too.
+                holder.groupName.isVisible = true
                 holder.groupName.summary = item.name
 
                 holder.notifications.isEnabled = !item.blocked
