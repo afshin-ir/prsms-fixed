@@ -77,8 +77,8 @@ jobs:
             gh release upload "$RELEASE_TAG" "$APK_PATH" --clobber
           else
             gh release create "$RELEASE_TAG" "$APK_PATH" \
-              --title "PRSMS $RELEASE_TAG" \
-              --notes "نسخهٔ پیامک با استثنای پیش‌گزیدهٔ مخاطبان از مسدودسازی کلیدواژه‌ای." \
+              --title "پیامک $RELEASE_TAG" \
+              --notes "بهبود نمایش تاریخ‌های جلالی در فهرست پیام‌های مسدودشده و جابه‌جایی این فهرست بالاتر از شماره‌های مسدودشده." \
               --target "$GITHUB_SHA"
           fi
 
