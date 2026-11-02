@@ -49,11 +49,11 @@ android {
     flavorDimensions "analytics"
 
     defaultConfig {
-        applicationId "com.freetux.PRSMS"
+        applicationId "ir.afshin.prsms"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 2222
-        versionName "1.0.0"
+        versionCode 2223
+        versionName "1.0.1"
         setProperty("archivesBaseName", "PRSMS-v${versionName}")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

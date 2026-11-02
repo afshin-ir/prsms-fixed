@@ -74,7 +74,7 @@ jobs:
           else
             gh release create "$RELEASE_TAG" "$APK_PATH" \
               --title "PRSMS $RELEASE_TAG" \
-              --notes "First stable release of PRSMS with fixes for blocked-message ordering and backup/restore." \
+              --notes "Fork release for side-by-side installation with upstream PRSMS. Includes fixes for blocked-conversation ordering and backup saving." \
               --target "$GITHUB_SHA"
           fi
 
