@@ -67,7 +67,9 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
 
     // Keep the requested visual sequence "day month" in the open-message timestamp.
     private fun formatPersianMessageMonthDay(date: PersianDate): String {
-        return formatPersianDate(date, "j F")
+        val day = getPersianDateFormat("j").format(date)
+        val month = getPersianDateFormat("F").format(date)
+        return "\u2066$day\u00A0$month\u2069"
     }
 
     private fun formatPersianMessageTimestamp(time: String, date: String? = null): String {
