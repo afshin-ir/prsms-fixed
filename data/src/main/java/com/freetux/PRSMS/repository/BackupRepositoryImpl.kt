@@ -26,8 +26,8 @@ import androidx.core.content.contentValuesOf
 import com.freetux.PRSMS.model.BackupFile
 import com.freetux.PRSMS.model.BlockedNumber
 import com.freetux.PRSMS.model.Conversation
-import com.freetux.PRSMS.model.Message
 import com.freetux.PRSMS.common.util.shamsicalendar.PersianDate
+import com.freetux.PRSMS.model.Message
 import com.freetux.PRSMS.util.Preferences
 import com.freetux.PRSMS.util.tryOrNull
 import com.squareup.moshi.Moshi
@@ -42,7 +42,6 @@ import timber.log.Timber
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
