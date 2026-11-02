@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - .release-version
+      - .github/workflows/release.yml
 
 permissions:
   contents: write
