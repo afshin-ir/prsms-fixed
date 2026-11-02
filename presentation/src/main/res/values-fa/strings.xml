@@ -276,7 +276,8 @@
     <string name="blocking_keywords_summary">مدیریت واژه‌ها یا عبارت‌هایی که پیام‌های دریافتی را مسدود می‌کنند</string>
     <string name="blocking_keywords_match_summary">پیام دریافتی که یکی از واژه‌ها یا عبارت‌های این فهرست را داشته باشد مسدود می‌شود. بزرگی و کوچکی حروف لاتین در تطبیق نادیده گرفته می‌شود.</string>
     <string name="blocking_keywords_add">افزودن کلیدواژه</string>
-    <string name="blocking_keywords_remove">حذف موارد انتخاب‌شده</string>
+    <string name="blocking_keywords_remove">حذف کلیدواژه</string>
+    <string name="blocking_keywords_empty">هنوز کلیدواژه‌ای مسدود نشده است</string>
     <string name="blocking_keywords_hint">واژه یا عبارت</string>
     <string name="blocking_keywords_save">ذخیره</string>
     <string name="blocking_keywords_contacts_title">پیامک مخاطبان را با کلیدواژه مسدود نکن</string>
