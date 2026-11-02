@@ -80,7 +80,7 @@ jobs:
           else
             gh release create "$RELEASE_TAG" "$APK_PATH" \
               --title "پیامک $RELEASE_TAG" \
-              --notes "اصلاح جداسازی رقم‌های روز و سال در تاریخ کامل جلالیِ پیام بازشده." \
+              --notes "افزودن امکان انتخاب پوشهٔ دلخواه برای ذخیره‌سازی و مدیریت پشتیبان‌ها." \
               --target "$GITHUB_SHA"
           fi
 
