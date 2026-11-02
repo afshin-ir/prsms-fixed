@@ -24,7 +24,6 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.ContentValues
-import android.content.res.Configuration
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -47,8 +46,6 @@ import com.freetux.PRSMS.R
 import com.freetux.PRSMS.common.Navigator
 import com.freetux.PRSMS.common.base.QkThemedActivity
 import com.freetux.PRSMS.common.util.DateFormatter
-import com.freetux.PRSMS.common.util.shamsicalendar.PersianDate
-import com.freetux.PRSMS.util.Preferences
 import com.freetux.PRSMS.common.util.extensions.*
 import com.freetux.PRSMS.feature.compose.editing.ChipsAdapter
 import com.freetux.PRSMS.feature.contacts.ContactsActivity
@@ -262,38 +259,17 @@ class ComposeActivity : QkThemedActivity(), ComposeView {
 
     override fun requestDatePicker() {
         val calendar = Calendar.getInstance()
-        val useJalaliCalendar = prefs.shamsiDate.get()
-        val initialPersianDate = PersianDate(calendar.timeInMillis)
-
-        val pickerContext = if (useJalaliCalendar) {
-            val configuration = Configuration(resources.configuration)
-            configuration.setLocale(Locale("fa", "IR"))
-            createConfigurationContext(configuration)
-        } else {
-            this
-        }
-
-        val year = if (useJalaliCalendar) initialPersianDate.getShYear() else calendar.get(Calendar.YEAR)
-        val month = if (useJalaliCalendar) initialPersianDate.getShMonth() - 1 else calendar.get(Calendar.MONTH)
-        val day = if (useJalaliCalendar) initialPersianDate.getShDay() else calendar.get(Calendar.DAY_OF_MONTH)
-
-        DatePickerDialog(pickerContext, DatePickerDialog.OnDateSetListener { _, selectedYear, selectedMonth, selectedDay ->
+        DatePickerDialog(this, DatePickerDialog.OnDateSetListener { _, year, month, day ->
             TimePickerDialog(this, TimePickerDialog.OnTimeSetListener { _, hour, minute ->
-                if (useJalaliCalendar) {
-                    val selectedDate = PersianDate()
-                            .initJalaliDate(selectedYear, selectedMonth + 1, selectedDay, hour, minute, 0)
-                    scheduleSelectedIntent.onNext(selectedDate.time)
-                } else {
-                    calendar.set(Calendar.YEAR, selectedYear)
-                    calendar.set(Calendar.MONTH, selectedMonth)
-                    calendar.set(Calendar.DAY_OF_MONTH, selectedDay)
-                    calendar.set(Calendar.HOUR_OF_DAY, hour)
-                    calendar.set(Calendar.MINUTE, minute)
-                    scheduleSelectedIntent.onNext(calendar.timeInMillis)
-                }
+                calendar.set(Calendar.YEAR, year)
+                calendar.set(Calendar.MONTH, month)
+                calendar.set(Calendar.DAY_OF_MONTH, day)
+                calendar.set(Calendar.HOUR_OF_DAY, hour)
+                calendar.set(Calendar.MINUTE, minute)
+                scheduleSelectedIntent.onNext(calendar.timeInMillis)
             }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), DateFormat.is24HourFormat(this))
                     .show()
-        }, year, month, day).show()
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
         // On some devices, the keyboard can cover the date picker
         message.hideKeyboard()
     }
