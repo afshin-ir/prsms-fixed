@@ -26,7 +26,6 @@ import androidx.core.content.contentValuesOf
 import com.freetux.PRSMS.model.BackupFile
 import com.freetux.PRSMS.model.BlockedNumber
 import com.freetux.PRSMS.model.Conversation
-import com.freetux.PRSMS.common.util.shamsicalendar.PersianDate
 import com.freetux.PRSMS.model.Message
 import com.freetux.PRSMS.util.Preferences
 import com.freetux.PRSMS.util.tryOrNull
@@ -191,14 +190,7 @@ class BackupRepositoryImpl @Inject constructor(
         )).toByteArray()
 
         val saved = try {
-            val backupDate = PersianDate(System.currentTimeMillis())
-            val jalaliDate = String.format(
-                    Locale.US,
-                    "%04d-%02d-%02d",
-                    backupDate.getShYear(),
-                    backupDate.getShMonth(),
-                    backupDate.getShDay()
-            )
+            val jalaliDate = getJalaliDate(System.currentTimeMillis())
             val directoryUri = prefs.backupDirectoryUri.get().takeIf { it.isNotBlank() }?.let { Uri.parse(it) }
             val fileName = getUniqueBackupFileName(directoryUri, jalaliDate)
             if (directoryUri == null) {
@@ -230,6 +222,45 @@ class BackupRepositoryImpl @Inject constructor(
         // Report success only after the file has actually been written.
         backupProgress.onNext(if (saved) BackupRepository.Progress.Finished() else BackupRepository.Progress.Failed())
         Timer().schedule(1000) { backupProgress.onNext(BackupRepository.Progress.Idle()) }
+    }
+
+    private fun getJalaliDate(timestamp: Long): String {
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
+        val gregorianYear = calendar.get(Calendar.YEAR)
+        val gregorianMonth = calendar.get(Calendar.MONTH) + 1
+        val gregorianDay = calendar.get(Calendar.DAY_OF_MONTH)
+        val gregorianMonthLengths = intArrayOf(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+        val jalaliMonthLengths = intArrayOf(31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29)
+
+        var year = gregorianYear - 1600
+        val month = gregorianMonth - 1
+        val day = gregorianDay - 1
+
+        var gregorianDayNumber = 365 * year + (year + 3) / 4 - (year + 99) / 100 + (year + 399) / 400
+        for (index in 0 until month) gregorianDayNumber += gregorianMonthLengths[index]
+        if (month > 1 && (gregorianYear % 4 == 0 && gregorianYear % 100 != 0 || gregorianYear % 400 == 0)) {
+            gregorianDayNumber++
+        }
+        gregorianDayNumber += day
+
+        var jalaliDayNumber = gregorianDayNumber - 79
+        val cycles = jalaliDayNumber / 12053
+        jalaliDayNumber %= 12053
+        var jalaliYear = 979 + 33 * cycles + 4 * (jalaliDayNumber / 1461)
+        jalaliDayNumber %= 1461
+        if (jalaliDayNumber >= 366) {
+            jalaliYear += (jalaliDayNumber - 1) / 365
+            jalaliDayNumber = (jalaliDayNumber - 1) % 365
+        }
+
+        var jalaliMonth = 0
+        while (jalaliMonth < 11 && jalaliDayNumber >= jalaliMonthLengths[jalaliMonth]) {
+            jalaliDayNumber -= jalaliMonthLengths[jalaliMonth]
+            jalaliMonth++
+        }
+        val jalaliDay = jalaliDayNumber + 1
+
+        return String.format(Locale.US, "%04d-%02d-%02d", jalaliYear, jalaliMonth + 1, jalaliDay)
     }
 
     private fun getUniqueBackupFileName(directoryUri: Uri?, jalaliDate: String): String {
