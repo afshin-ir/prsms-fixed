@@ -1,6 +1,7 @@
 name: Build and publish signed release APK
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - .release-version
