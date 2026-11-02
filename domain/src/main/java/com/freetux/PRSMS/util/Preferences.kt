@@ -105,6 +105,7 @@ class Preferences @Inject constructor(
     val drop = rxPrefs.getBoolean("drop", false)
     val blockedKeywords = rxPrefs.getStringSet("blockedKeywords", emptySet())
     val backupDirectoryUri = rxPrefs.getString("backupDirectoryUri", "")
+    val automaticBackup = rxPrefs.getBoolean("automaticBackup", true)
     val excludeContactsFromKeywordBlocking = rxPrefs.getBoolean("excludeContactsFromKeywordBlocking", true)
     val notifAction1 = rxPrefs.getInteger("notifAction1", NOTIFICATION_ACTION_READ)
     val notifAction2 = rxPrefs.getInteger("notifAction2", NOTIFICATION_ACTION_REPLY)
