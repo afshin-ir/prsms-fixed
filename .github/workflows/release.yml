@@ -80,7 +80,7 @@ jobs:
           else
             gh release create "$RELEASE_TAG" "$APK_PATH" \
               --title "پیامک $RELEASE_TAG" \
-              --notes "نمایش تاریخ کامل پیام بازشده به شکل روز، نام ماه و سال جلالی برای خوانایی بهتر در رابط راست‌به‌چپ." \
+              --notes "اصلاح جداسازی رقم‌های روز و سال در تاریخ کامل جلالیِ پیام بازشده." \
               --target "$GITHUB_SHA"
           fi
 
