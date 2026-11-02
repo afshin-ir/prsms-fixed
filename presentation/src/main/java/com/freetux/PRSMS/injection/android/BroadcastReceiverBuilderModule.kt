@@ -22,6 +22,7 @@ import com.freetux.PRSMS.feature.widget.WidgetProvider
 import com.freetux.PRSMS.injection.scope.ActivityScope
 import com.freetux.PRSMS.receiver.BlockThreadReceiver
 import com.freetux.PRSMS.receiver.BootReceiver
+import com.freetux.PRSMS.receiver.AutomaticBackupReceiver
 import com.freetux.PRSMS.receiver.DefaultSmsChangedReceiver
 import com.freetux.PRSMS.receiver.DeleteMessagesReceiver
 import com.freetux.PRSMS.receiver.MarkArchivedReceiver
@@ -51,6 +52,10 @@ abstract class BroadcastReceiverBuilderModule {
     @ActivityScope
     @ContributesAndroidInjector()
     abstract fun bindBootReceiver(): BootReceiver
+
+    @ActivityScope
+    @ContributesAndroidInjector()
+    abstract fun bindAutomaticBackupReceiver(): AutomaticBackupReceiver
 
     @ActivityScope
     @ContributesAndroidInjector()

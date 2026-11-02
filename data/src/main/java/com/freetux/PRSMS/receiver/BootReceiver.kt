@@ -22,15 +22,18 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.freetux.PRSMS.interactor.UpdateScheduledMessageAlarms
+import com.freetux.PRSMS.util.Preferences
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
 class BootReceiver : BroadcastReceiver() {
 
     @Inject lateinit var updateScheduledMessageAlarms: UpdateScheduledMessageAlarms
+    @Inject lateinit var preferences: Preferences
 
     override fun onReceive(context: Context, intent: Intent?) {
         AndroidInjection.inject(this, context)
+        AutomaticBackupScheduler.schedule(context, preferences.automaticBackup.get())
 
         val result = goAsync()
         updateScheduledMessageAlarms.execute(Unit) { result.finish() }

@@ -128,6 +128,9 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name="com.freetux.PRSMS.receiver.AutomaticBackupReceiver"
+            android:exported="false" />
         <receiver android:name="com.freetux.PRSMS.receiver.DefaultSmsChangedReceiver">
             <intent-filter>
                 <action android:name="android.provider.action.DEFAULT_SMS_PACKAGE_CHANGED" />
