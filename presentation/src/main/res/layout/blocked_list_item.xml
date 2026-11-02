@@ -56,7 +56,6 @@
     <com.freetux.PRSMS.common.widget.QkTextView
         android:id="@+id/date"
         android:textDirection="ltr"
-        android:textDirection="ltr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
