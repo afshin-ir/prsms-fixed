@@ -72,6 +72,14 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
         return "\u2066$day\u00A0$month\u2069"
     }
 
+    // Keep the three date fields isolated from punctuation in the open-message RTL timestamp.
+    private fun formatPersianMessageYearMonthDay(date: PersianDate): String {
+        val year = getPersianDateFormat("Y").format(date)
+        val month = getPersianDateFormat("n").format(date)
+        val day = getPersianDateFormat("j").format(date)
+        return "\u2066$year\u200E/\u200E$month\u200E/\u200E$day\u2069"
+    }
+
     private fun formatPersianMessageTimestamp(time: String, date: String? = null): String {
         val datePart = date?.let { " در: $it" } ?: ""
         return "\u2067ساعت: \u2066$time\u2069$datePart\u2069"
@@ -125,7 +133,7 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
             )
             else -> formatPersianMessageTimestamp(
                     time,
-                    formatPersianDate(pdate, "Y/n/j")
+                    formatPersianMessageYearMonthDay(pdate)
             )
         }
     }
