@@ -8,8 +8,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Base64;
 
 import java.nio.ByteBuffer;
@@ -162,7 +160,7 @@ public final class CallControl {
          *
          * @param number Number being reported.
          */
-        public Report(@NonNull String number) {
+        public Report(String number) {
             this(number, null, true);
         }
 
@@ -172,7 +170,7 @@ public final class CallControl {
          * @param number Number being reported.
          * @param name   Name known for the number.
          */
-        public Report(@NonNull String number, @Nullable String name) {
+        public Report(String number, String name) {
             this(number, name, true);
         }
 
@@ -183,7 +181,7 @@ public final class CallControl {
          * @param name       Name known for the number.
          * @param isUnwanted Indicates if user doesn't want to be contacted by the number.
          */
-        public Report(@NonNull String number, @Nullable String name, boolean isUnwanted) {
+        public Report(String number, String name, boolean isUnwanted) {
             this.number = number;
             this.name = name;
             this.isUnwanted = isUnwanted;
@@ -205,7 +203,6 @@ public final class CallControl {
          *
          * @return Associated phone number.
          */
-        @NonNull
         public String getNumber() {
             return number;
         }
@@ -215,7 +212,6 @@ public final class CallControl {
          *
          * @return Associated name, if any.
          */
-        @Nullable
         public String getName() {
             return name;
         }
@@ -264,7 +260,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean openBlockedList(@NonNull Context context) {
+    public static boolean openBlockedList(Context context) {
         return openBlockedList(context, null, 0);
     }
 
@@ -276,7 +272,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean openBlockedList(@NonNull Context context, int intentFlags) {
+    public static boolean openBlockedList(Context context, int intentFlags) {
         return openBlockedList(context, null, intentFlags);
     }
 
@@ -289,7 +285,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean openBlockedList(@NonNull Context context, @Nullable String phoneNumber) {
+    public static boolean openBlockedList(Context context, String phoneNumber) {
         return openBlockedList(context, phoneNumber, 0);
     }
 
@@ -303,7 +299,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean openBlockedList(@NonNull Context context, @Nullable String phoneNumber, int intentFlags) {
+    public static boolean openBlockedList(Context context, String phoneNumber, int intentFlags) {
         Intent i = new Intent(ACTION_BLOCKED_LIST);
         if (null != phoneNumber) i.putExtra(EXTRA_PHONE_NUMBER, phoneNumber);
         if (0 != intentFlags) i.setFlags(intentFlags);
@@ -320,7 +316,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean lookupNumber(@NonNull Context context, @NonNull String phoneNumber) {
+    public static boolean lookupNumber(Context context, String phoneNumber) {
         return lookupNumber(context, phoneNumber, 0);
     }
 
@@ -333,7 +329,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean lookupNumber(@NonNull Context context, @NonNull String phoneNumber, int intentFlags) {
+    public static boolean lookupNumber(Context context, String phoneNumber, int intentFlags) {
         Intent i = new Intent(ACTION_LOOKUP);
         i.putExtra(EXTRA_PHONE_NUMBER, phoneNumber);
         if (0 != intentFlags) i.setFlags(intentFlags);
@@ -359,7 +355,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean addRule(@NonNull Context context, @NonNull Report report) {
+    public static boolean addRule(Context context, Report report) {
         return addRule(context, report, 0);
     }
 
@@ -380,7 +376,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean addRule(@NonNull Context context, @NonNull Report report, int intentFlags) {
+    public static boolean addRule(Context context, Report report, int intentFlags) {
         ArrayList<Report> list = new ArrayList<>(1);
         list.add(report);
         return addRule(context, list, intentFlags);
@@ -402,7 +398,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean addRule(@NonNull Context context, @NonNull ArrayList<Report> reports) {
+    public static boolean addRule(Context context, ArrayList<Report> reports) {
         return addRule(context, reports, 0);
     }
 
@@ -423,7 +419,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean addRule(@NonNull Context context, @NonNull ArrayList<Report> reports, int intentFlags) {
+    public static boolean addRule(Context context, ArrayList<Report> reports, int intentFlags) {
         if (reports.isEmpty()) return false;
         boolean isUnwanted = reports.get(0).isUnwanted;
         for (Report n : reports) {
@@ -448,7 +444,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean report(@NonNull Context context, @NonNull Report report) {
+    public static boolean report(Context context, Report report) {
         return report(context, report, 0);
     }
 
@@ -463,7 +459,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean report(@NonNull Context context, @NonNull Report report, int intentFlags) {
+    public static boolean report(Context context, Report report, int intentFlags) {
         ArrayList<Report> list = new ArrayList<>(1);
         list.add(report);
         return report(context, list, intentFlags);
@@ -489,7 +485,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean report(@NonNull Context context, @NonNull ArrayList<Report> reports) {
+    public static boolean report(Context context, ArrayList<Report> reports) {
         return report(context, reports, 0);
     }
 
@@ -514,7 +510,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean report(@NonNull Context context, @NonNull ArrayList<Report> reports, int intentFlags) {
+    public static boolean report(Context context, ArrayList<Report> reports, int intentFlags) {
         if (reports.isEmpty()) return false;
         boolean isUnwanted = reports.get(0).isUnwanted;
         for (Report n : reports) {
@@ -535,7 +531,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean openAccessSettings(@NonNull Context context) {
+    public static boolean openAccessSettings(Context context) {
         return openAccessSettings(context, 0);
     }
 
@@ -547,7 +543,7 @@ public final class CallControl {
      *
      * @return True if the intent has been sent, false on error.
      */
-    public static boolean openAccessSettings(@NonNull Context context, int intentFlags) {
+    public static boolean openAccessSettings(Context context, int intentFlags) {
         Intent i = new Intent(ACTION_3RD_PARTY_ACCESS);
         if (0 != intentFlags) i.setFlags(intentFlags);
         if (!signIntent(context, i)) return false;
@@ -564,7 +560,7 @@ public final class CallControl {
      * @param intent  Intent to "sign".
      * @return True if the sign succeeded, false otherwise.
      */
-    private static boolean signIntent(@NonNull Context context, @NonNull Intent intent) {
+    private static boolean signIntent(Context context, Intent intent) {
         try {
             long currentTime = System.currentTimeMillis();
             String sender = context.getPackageName();
