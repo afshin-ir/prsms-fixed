@@ -64,6 +64,11 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
         return "\u2067" + getPersianDateFormat("j F").format(date) + "\u2069"
     }
 
+    private fun formatPersianMessageTimestamp(time: String, date: String? = null): String {
+        val datePart = date?.let { " در: $it" } ?: ""
+        return "\u2067ساعت \u2066$time\u2069$datePart\u2069"
+    }
+
     fun getDetailedTimestamp(date: Long): String {
         val pdate = PersianDate(date)
         if (!prefs.shamsiDate.get()) {
@@ -88,10 +93,7 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
         then.timeInMillis = date
         val pdate = PersianDate(date)
         val pdatenow = PersianDate()
-        val nowyear = pdatenow.getShYear()
         val thenyear = pdate.getShYear()
-
-
 
         if (!prefs.shamsiDate.get()) {
             return when {
@@ -100,18 +102,24 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
                 now.isSameYear(then) -> getFormatter("MMM d, h:mm a")
                 else -> getFormatter("MMM d yyyy, h:mm a")
             }.format(date)
-
-        } else {
-            return when {
-                now.isSameDay(then) -> getFormatter("h:mm a").format(date)
-                now.isSameWeek(then) -> getFormatter("E h:mm a").format(date)
-                isSameShamsiYear(thenyear) -> formatPersianMonthDay(pdate) + " در " + getFormatter("h:mm a").format(date)
-                else -> formatPersianDate(pdate, "Y/n/j") + " در " + getFormatter("h:mm a").format(date)
-            }
-
         }
 
-
+        val time = getFormatter("h:mm a").format(date)
+        return when {
+            now.isSameDay(then) -> formatPersianMessageTimestamp(time)
+            now.isSameWeek(then) -> formatPersianMessageTimestamp(
+                    time,
+                    getPersianDateFormat("l").format(pdate)
+            )
+            isSameShamsiYear(thenyear) -> formatPersianMessageTimestamp(
+                    time,
+                    formatPersianMonthDay(pdate)
+            )
+            else -> formatPersianMessageTimestamp(
+                    time,
+                    formatPersianDate(pdate, "Y/n/j")
+            )
+        }
     }
 
     fun getConversationTimestamp(date: Long): String {
