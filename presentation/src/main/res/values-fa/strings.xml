@@ -146,6 +146,8 @@
     <string name="backup_location_title">پوشهٔ پشتیبان‌گیری</string>
     <string name="backup_location_summary_default">برای انتخاب محل ذخیرهٔ پشتیبان‌ها بزنید</string>
     <string name="backup_location_summary_selected">برای تغییر پوشهٔ انتخاب‌شده بزنید</string>
+    <string name="backup_auto_title">پشتیبان‌گیری خودکار روزانه</string>
+    <string name="backup_auto_summary">هر روز پشتیبان می‌گیرد و دو نسخهٔ تازه را نگه می‌دارد</string>
     <string name="backup_backing_up">پشتیبان‌گیری از پیام‌ها</string>
     <string name="backup_restoring">بازگرداندن پشتیبان</string>
     <string name="backup_last">اخرین پشیبان گیری</string>
@@ -179,7 +181,7 @@
         <item quantity="one">%d پیام</item>
         <item quantity="other">%d پیام</item>
     </plurals>
-    <string name="backup_disclaimer">در حال حاضر ، فقط پشتیبان‌گیری و بازگردانی پیامک پشتیبانی می شود. پشتیبان‌گیری و برنامه‌ریزی برای پشتیبان‌گیری از MMS به زودی ارائه می شود!</string>
+    <string name="backup_disclaimer">پشتیبان‌گیری خودکار هر روز انجام می‌شود و دو نسخهٔ تازه را نگه می‌دارد. در حال حاضر فقط پیامک پشتیبانی می‌شود؛ پشتیبان‌گیری از MMS بعداً افزوده می‌شود.</string>
     <string name="backup_now">اکنون پشتیبان‌گیری کن</string>
     <string name="backup_progress_parsing">در حال تجزیه پشتیبان&#8230;</string>
     <string name="backup_progress_running">%d/%d پیام</string>
