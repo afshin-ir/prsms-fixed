@@ -56,7 +56,7 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
 
     // Keep numeric date fields in a predictable left-to-right sequence inside RTL layouts.
     private fun formatPersianDate(date: PersianDate, pattern: String): String {
-        return "\u2066" + getPersianDateFormat(pattern).format(date) + "\u2069"
+        return "\u200E" + getPersianDateFormat(pattern).format(date) + "\u200E"
     }
 
     fun getDetailedTimestamp(date: Long): String {
@@ -64,7 +64,7 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
         if (!prefs.shamsiDate.get()) {
             return getFormatter("M/d/y, h:mm:ss a").format(date)
         } else {
-            return getPersianDateFormat("Y/m/d").format(pdate) + " در " + getFormatter("h:mm:ss a").format(date)
+            return formatPersianDate(pdate, "Y/n/j") + " در " + getFormatter("h:mm:ss a").format(date)
         }
     }
 
@@ -100,8 +100,8 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
             return when {
                 now.isSameDay(then) -> getFormatter("h:mm a").format(date)
                 now.isSameWeek(then) -> getFormatter("E h:mm a").format(date)
-                isSameShamsiYear(thenyear) -> getPersianDateFormat("d F").format(pdate) + " در " + getFormatter("h:mm a").format(date)
-                else -> getPersianDateFormat("d F Y").format(pdate) + " در " +  getFormatter("h:mm a").format(date)
+                isSameShamsiYear(thenyear) -> formatPersianDate(pdate, "F j") + " در " + getFormatter("h:mm a").format(date)
+                else -> formatPersianDate(pdate, "Y/n/j") + " در " + getFormatter("h:mm a").format(date)
             }
 
         }
@@ -154,8 +154,8 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
         } else {
             return when {
                 now.isSameDay(then) -> getFormatter("h:mm a").format(date)
-                isSameShamsiYear(thenyear) -> getPersianDateFormat("d F ").format(pdate) + " در " + getFormatter("h:mm a").format(date)
-                else -> getPersianDateFormat("d F Y ").format(pdate) + " در " + getFormatter("h:mm a").format(date)
+                isSameShamsiYear(thenyear) -> formatPersianDate(pdate, "F j") + " در " + getFormatter("h:mm a").format(date)
+                else -> formatPersianDate(pdate, "Y/n/j") + " در " + getFormatter("h:mm a").format(date)
             }
 
 
