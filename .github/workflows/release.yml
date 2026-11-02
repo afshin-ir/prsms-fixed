@@ -1,74 +1,63 @@
-name: Release Build
+name: Build and attach release APK
+
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Release Tag'
-        required: true
-      publish:
-        description: 'Publish: If want ignore'
-        required: false
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
 jobs:
-  check:
-    name: Check Access
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Check access"
-        uses: "lannonbr/repo-permission-check-action@2.0.0"
-        with:
-          permission: "write"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
   build:
-    name: Gradle Build
+    name: Build signed APK
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: set up JDK 8
-      uses: actions/setup-java@v3
-      with:
-        java-version: '8'
-        distribution: 'temurin'
-        cache: gradle
-
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Build with Gradle
-      run: |
-          export LOCAL_PROPERTIES="${{ secrets.LOCAL_PROPERTIES }}"
-          ./gradlew build
-          APK=$(find presentation/build/outputs/apk/noAnalytics/release/ -name '*.apk')
-          APK=$(dirname $APK)
-          echo "APK=$APK" >> $GITHUB_ENV
-          
-    - uses: kolpav/purge-artifacts-action@v1
-      with:
-        token: ${{ secrets.GIT_TOKEN }}
-        expire-in: 0
-  
-  publish:
-    name: Publish Release
-    if: github.event.inputs.publish != 'y'
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Donwload Artifacts
-        uses: actions/download-artifact@v2
-        with:
-          path: artifacts
-      - uses: actions/upload-artifact@v2
-        with:
-          name: noAnalyticsRelease
-          path: ${{ env.APK }}
-      - name: Release
+      - name: Check signing secrets
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+          ALIAS_NAME: ${{ secrets.ALIAS_NAME }}
+          ALIAS_PASS: ${{ secrets.ALIAS_PASS }}
         run: |
-          wget -O ghr.tar.gz https://github.com/tcnksm/ghr/releases/download/v0.13.0/ghr_v0.13.0_linux_amd64.tar.gz
-          tar -xvf ghr.tar.gz
-          mv ghr*linux_amd64/ghr .
-          mkdir apks
-          find artifacts -name "*.apk" -exec cp {} apks \;
-          ./ghr -delete -t "${{ github.token }}" -n "${{ github.event.inputs.tag }}" "${{ github.event.inputs.tag }}" apks
-          
+          test -n "$ANDROID_KEYSTORE_BASE64" || { echo "::error::Missing ANDROID_KEYSTORE_BASE64 secret"; exit 1; }
+          test -n "$KEYSTORE_PASS" || { echo "::error::Missing KEYSTORE_PASS secret"; exit 1; }
+          test -n "$ALIAS_NAME" || { echo "::error::Missing ALIAS_NAME secret"; exit 1; }
+          test -n "$ALIAS_PASS" || { echo "::error::Missing ALIAS_PASS secret"; exit 1; }
+
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: temurin
+          cache: gradle
+
+      - name: Restore release signing key
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > presentation/Keystore.jks
+          test -s presentation/Keystore.jks
+
+      - name: Build release APK
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+          ALIAS_NAME: ${{ secrets.ALIAS_NAME }}
+          ALIAS_PASS: ${{ secrets.ALIAS_PASS }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon :presentation:assembleNoAnalyticsRelease
+          APK_PATH="$(find presentation/build/outputs/apk/noAnalytics/release -maxdepth 1 -type f -name '*.apk' -print -quit)"
+          test -n "$APK_PATH" || { echo "::error::Gradle did not produce a release APK"; exit 1; }
+          echo "APK_PATH=$APK_PATH" >> "$GITHUB_ENV"
+
+      - name: Upload APK to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" "$APK_PATH" --clobber
+
+      - name: Remove signing key
+        if: always()
+        run: rm -f presentation/Keystore.jks
