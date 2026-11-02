@@ -96,8 +96,8 @@ class BlockingController : QkController<BlockingView, BlockingState, BlockingPre
 
     override fun openBlockedKeywords() {
         val currentActivity = activity ?: return
-        val padding = (16 * resources.displayMetrics.density).toInt()
-        val rowHeight = (48 * resources.displayMetrics.density).toInt()
+        val padding = (16 * currentActivity.resources.displayMetrics.density).toInt()
+        val rowHeight = (48 * currentActivity.resources.displayMetrics.density).toInt()
         val content = LinearLayout(currentActivity).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(padding, padding / 2, padding, 0)
@@ -119,7 +119,7 @@ class BlockingController : QkController<BlockingView, BlockingState, BlockingPre
         }
         content.addView(scroll, LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                (260 * resources.displayMetrics.density).toInt()
+                (260 * currentActivity.resources.displayMetrics.density).toInt()
         ))
 
         fun refreshList() {
