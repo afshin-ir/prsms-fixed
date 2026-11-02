@@ -40,6 +40,8 @@ import com.freetux.PRSMS.common.widget.PreferenceView
 import com.freetux.PRSMS.injection.appComponent
 import com.freetux.PRSMS.model.BackupFile
 import com.freetux.PRSMS.repository.BackupRepository
+import com.freetux.PRSMS.receiver.AutomaticBackupScheduler
+import com.freetux.PRSMS.util.Preferences
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
@@ -53,6 +55,7 @@ class BackupController : QkController<BackupView, BackupState, BackupPresenter>(
     @Inject lateinit var adapter: BackupAdapter
     @Inject lateinit var backupRepo: BackupRepository
     @Inject lateinit var dateFormatter: DateFormatter
+    @Inject lateinit var preferences: Preferences
     @Inject override lateinit var presenter: BackupPresenter
 
     private val activityVisibleSubject: Subject<Unit> = PublishSubject.create()
@@ -108,6 +111,14 @@ class BackupController : QkController<BackupView, BackupState, BackupPresenter>(
             fab.setBackgroundTint(theme.theme)
             fabIcon.setTint(theme.textPrimary)
             fabLabel.setTextColor(theme.textPrimary)
+        }
+
+        automaticBackup.checkbox.isChecked = preferences.automaticBackup.get()
+        automaticBackup.setOnClickListener {
+            val enabled = !preferences.automaticBackup.get()
+            preferences.automaticBackup.set(enabled)
+            automaticBackup.checkbox.isChecked = enabled
+            activity?.let { AutomaticBackupScheduler.schedule(it, enabled) }
         }
 
         // Make the list titles bold
