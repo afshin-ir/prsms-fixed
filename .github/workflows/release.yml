@@ -78,7 +78,7 @@ jobs:
           else
             gh release create "$RELEASE_TAG" "$APK_PATH" \
               --title "پیامک $RELEASE_TAG" \
-              --notes "نمایش جلالی تاریخ در انتخابگر زمان‌بندی؛ بهبود قالب ساعت و تاریخ پیام‌ها." \
+              --notes "رفع کرش زمان‌بندی پیام؛ اصلاح ترتیب و نگارش ساعت و تاریخ پیام‌ها." \
               --target "$GITHUB_SHA"
           fi
 
