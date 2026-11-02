@@ -9,6 +9,7 @@ on:
       - build.gradle
       - presentation/build.gradle
       - data/build.gradle
+      - data/src/main/java/com/callcontrol/datashare/CallControl.java
 
 permissions:
   contents: write
