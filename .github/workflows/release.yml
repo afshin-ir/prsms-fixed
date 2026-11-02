@@ -80,7 +80,7 @@ jobs:
           else
             gh release create "$RELEASE_TAG" "$APK_PATH" \
               --title "پیامک $RELEASE_TAG" \
-              --notes "نمایش عنوان گفتگو برای سرشماره‌های ناشناس در صفحهٔ اطلاعات گفتگو؛ بدون تغییر مخاطبان تلفن." \
+              --notes "اصلاح ذخیرهٔ عنوان دلخواه گفتگو در نخ پس‌زمینه برای جلوگیری از کرش." \
               --target "$GITHUB_SHA"
           fi
 
