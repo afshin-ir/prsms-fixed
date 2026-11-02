@@ -21,8 +21,12 @@ package com.freetux.PRSMS.feature.blocking
 import android.app.AlertDialog
 import android.content.Context
 import android.text.InputType
+import android.view.Gravity
 import android.view.View
 import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.ScrollView
+import android.widget.TextView
 import com.bluelinelabs.conductor.RouterTransaction
 import com.jakewharton.rxbinding2.view.clicks
 import com.freetux.PRSMS.R
@@ -91,31 +95,110 @@ class BlockingController : QkController<BlockingView, BlockingState, BlockingPre
     }
 
     override fun openBlockedKeywords() {
-        val keywords = prefs.blockedKeywords.get().filter { it.isNotBlank() }.sorted()
-        val selected = BooleanArray(keywords.size)
-        AlertDialog.Builder(activity!!)
+        val currentActivity = activity ?: return
+        val padding = (16 * resources.displayMetrics.density).toInt()
+        val rowHeight = (48 * resources.displayMetrics.density).toInt()
+        val content = LinearLayout(currentActivity).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(padding, padding / 2, padding, 0)
+        }
+        val description = TextView(currentActivity).apply {
+            text = context.getString(R.string.blocking_keywords_match_summary)
+            setPadding(0, 0, 0, padding)
+        }
+        content.addView(description)
+
+        val list = LinearLayout(currentActivity).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+        val scroll = ScrollView(currentActivity).apply {
+            addView(list, ScrollView.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            ))
+        }
+        content.addView(scroll, LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                (260 * resources.displayMetrics.density).toInt()
+        ))
+
+        fun refreshList() {
+            list.removeAllViews()
+            val keywords = prefs.blockedKeywords.get()
+                    .filter { it.isNotBlank() }
+                    .sorted()
+
+            if (keywords.isEmpty()) {
+                list.addView(TextView(currentActivity).apply {
+                    text = context.getString(R.string.blocking_keywords_empty)
+                    gravity = Gravity.CENTER_VERTICAL
+                    minHeight = rowHeight
+                })
+                return
+            }
+
+            keywords.forEach { keyword ->
+                val row = LinearLayout(currentActivity).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    layoutDirection = View.LAYOUT_DIRECTION_LOCALE
+                    minimumHeight = rowHeight
+                }
+                val label = TextView(currentActivity).apply {
+                    text = keyword
+                    gravity = Gravity.CENTER_VERTICAL
+                    maxLines = 1
+                    setPadding(0, 0, padding / 2, 0)
+                }
+                row.addView(label, LinearLayout.LayoutParams(0, rowHeight, 1f))
+
+                val remove = TextView(currentActivity).apply {
+                    text = "×"
+                    textSize = 24f
+                    gravity = Gravity.CENTER
+                    contentDescription = context.getString(R.string.blocking_keywords_remove)
+                    isClickable = true
+                    isFocusable = true
+                    setOnClickListener {
+                        val remaining = prefs.blockedKeywords.get()
+                                .filterNot { it.equals(keyword, ignoreCase = true) }
+                                .toSet()
+                        prefs.blockedKeywords.set(remaining)
+                        refreshList()
+                    }
+                }
+                row.addView(remove, LinearLayout.LayoutParams(rowHeight, rowHeight))
+                list.addView(row, LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        rowHeight
+                ))
+            }
+        }
+        refreshList()
+
+        val dialog = AlertDialog.Builder(currentActivity)
                 .setTitle(R.string.blocking_keywords_title)
-                .setMessage(R.string.blocking_keywords_match_summary)
-                .setMultiChoiceItems(keywords.toTypedArray(), selected) { _, which, isChecked ->
-                    selected[which] = isChecked
-                }
-                .setPositiveButton(R.string.blocking_keywords_add) { _, _ -> showAddKeywordDialog() }
-                .setNegativeButton(R.string.blocking_keywords_remove) { _, _ ->
-                    val remaining = keywords.filterIndexed { index, _ -> !selected[index] }.toSet()
-                    if (remaining.size != keywords.size) prefs.blockedKeywords.set(remaining)
-                }
-                .setNeutralButton(R.string.button_cancel, null)
-                .show()
+                .setView(content)
+                .setPositiveButton(R.string.blocking_keywords_add, null)
+                .setNegativeButton(R.string.button_cancel, null)
+                .create()
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                dialog.dismiss()
+                showAddKeywordDialog { openBlockedKeywords() }
+            }
+        }
+        dialog.show()
     }
 
-    private fun showAddKeywordDialog() {
+    private fun showAddKeywordDialog(onSaved: (() -> Unit)? = null) {
         val input = EditText(activity!!).apply {
             hint = context.getString(R.string.blocking_keywords_hint)
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
             setSingleLine(true)
         }
 
-        AlertDialog.Builder(activity!!)
+        var saved = false
+        val dialog = AlertDialog.Builder(activity!!)
                 .setTitle(R.string.blocking_keywords_add)
                 .setView(input)
                 .setPositiveButton(R.string.blocking_keywords_save) { _, _ ->
@@ -126,9 +209,14 @@ class BlockingController : QkController<BlockingView, BlockingState, BlockingPre
                             prefs.blockedKeywords.set(current + keyword)
                         }
                     }
+                    saved = true
                 }
                 .setNegativeButton(R.string.button_cancel, null)
-                .show()
+                .create()
+        dialog.setOnDismissListener {
+            if (saved) onSaved?.invoke()
+        }
+        dialog.show()
     }
 
     override fun openBlockingManager() {
