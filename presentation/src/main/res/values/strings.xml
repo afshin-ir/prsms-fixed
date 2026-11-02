@@ -309,6 +309,8 @@
     <string name="blocking_keywords_remove">Remove selected</string>
     <string name="blocking_keywords_hint">Word or phrase</string>
     <string name="blocking_keywords_save">Save</string>
+    <string name="blocking_keywords_contacts_title">Exclude contacts from keyword blocking</string>
+    <string name="blocking_keywords_contacts_summary">Allow messages from contacts even when they contain a blocked keyword</string>
     <string name="blocking_conversations">Blocked conversations</string>
 
     <string name="blocking_manager_title">Blocking Manager</string>

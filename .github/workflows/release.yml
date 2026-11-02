@@ -78,7 +78,7 @@ jobs:
           else
             gh release create "$RELEASE_TAG" "$APK_PATH" \
               --title "PRSMS $RELEASE_TAG" \
-              --notes "نسخهٔ پیامک با تقویم جلالی، تأیید تحویل و فونت سیستمِ پیش‌گزیده و مسدودسازی کلیدواژه‌ای." \
+              --notes "نسخهٔ پیامک با استثنای پیش‌گزیدهٔ مخاطبان از مسدودسازی کلیدواژه‌ای." \
               --target "$GITHUB_SHA"
           fi
 

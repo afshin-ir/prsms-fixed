@@ -54,6 +54,14 @@
             app:title="@string/blocking_keywords_title" />
 
         <com.freetux.PRSMS.common.widget.PreferenceView
+            android:id="@+id/keywordContacts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:summary="@string/blocking_keywords_contacts_summary"
+            app:title="@string/blocking_keywords_contacts_title"
+            app:widget="@layout/settings_switch_widget" />
+
+        <com.freetux.PRSMS.common.widget.PreferenceView
             android:id="@+id/drop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -279,6 +279,8 @@
     <string name="blocking_keywords_remove">حذف موارد انتخاب‌شده</string>
     <string name="blocking_keywords_hint">واژه یا عبارت</string>
     <string name="blocking_keywords_save">ذخیره</string>
+    <string name="blocking_keywords_contacts_title">پیامک مخاطبان را با کلیدواژه مسدود نکن</string>
+    <string name="blocking_keywords_contacts_summary">پیامک مخاطبان حتی با داشتن کلیدواژهٔ مسدودشده دریافت می‌شود</string>
     <string name="blocking_conversations">گفتگوهای مسدود شده</string>
     <string name="blocking_manager_title">مدیریت انسداد</string>
     <string name="blocking_manager_qksms_title">پیامک</string>

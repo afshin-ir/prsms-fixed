@@ -23,6 +23,7 @@ import com.freetux.PRSMS.blocking.BlockingClient
 import com.freetux.PRSMS.extensions.mapNotNull
 import com.freetux.PRSMS.manager.NotificationManager
 import com.freetux.PRSMS.manager.ShortcutManager
+import com.freetux.PRSMS.repository.ContactRepository
 import com.freetux.PRSMS.repository.ConversationRepository
 import com.freetux.PRSMS.repository.MessageRepository
 import com.freetux.PRSMS.util.Preferences
@@ -32,6 +33,7 @@ import javax.inject.Inject
 
 class ReceiveSms @Inject constructor(
     private val conversationRepo: ConversationRepository,
+    private val contactRepo: ContactRepository,
     private val blockingClient: BlockingClient,
     private val prefs: Preferences,
     private val messageRepo: MessageRepository,
@@ -54,7 +56,14 @@ class ReceiveSms @Inject constructor(
                     val body: String = messages
                             .mapNotNull { message -> message.displayMessageBody }
                             .reduce { body, new -> body + new }
-                    val matchedKeyword = prefs.blockedKeywords.get()
+                    val blockedKeywords = prefs.blockedKeywords.get()
+                    val senderIsContact = prefs.excludeContactsFromKeywordBlocking.get() &&
+                            blockedKeywords.isNotEmpty() &&
+                            contactRepo.findContactUri(address)
+                                    .map { true }
+                                    .onErrorReturnItem(false)
+                                    .blockingGet()
+                    val matchedKeyword = if (senderIsContact) null else blockedKeywords
                             .firstOrNull { keyword -> keyword.isNotBlank() && body.contains(keyword, ignoreCase = true) }
                     val keywordBlocked = senderAction !is BlockingClient.Action.Block && matchedKeyword != null
                     val action = if (keywordBlocked) {

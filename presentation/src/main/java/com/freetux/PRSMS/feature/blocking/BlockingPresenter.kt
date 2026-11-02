@@ -49,6 +49,9 @@ class BlockingPresenter @Inject constructor(
 
         disposables += prefs.drop.asObservable()
                 .subscribe { enabled -> newState { copy(dropEnabled = enabled) } }
+
+        disposables += prefs.excludeContactsFromKeywordBlocking.asObservable()
+                .subscribe { enabled -> newState { copy(excludeContactsFromKeywordBlocking = enabled) } }
     }
 
     override fun bindIntents(view: BlockingView) {
@@ -80,6 +83,12 @@ class BlockingPresenter @Inject constructor(
         view.dropClickedIntent
                 .autoDisposable(view.scope())
                 .subscribe { prefs.drop.set(!prefs.drop.get()) }
+
+        view.keywordContactsIntent
+                .autoDisposable(view.scope())
+                .subscribe {
+                    prefs.excludeContactsFromKeywordBlocking.set(!prefs.excludeContactsFromKeywordBlocking.get())
+                }
     }
 
 }
