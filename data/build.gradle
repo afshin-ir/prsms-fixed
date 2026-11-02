@@ -86,7 +86,7 @@ dependencies {
     implementation "com.jakewharton.timber:timber:$timber_version"
     implementation "com.squareup.moshi:moshi:$moshi_version"
     implementation "com.squareup.okhttp3:okhttp:$okhttp3_version"
-    implementation 'io.michaelrocks:libphonenumber-android:8.13.55'
+    implementation 'io.michaelrocks:libphonenumber-android:8.12.23'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation project(":android-smsmms")
     implementation project(':common')
