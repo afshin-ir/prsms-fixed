@@ -56,11 +56,11 @@
     <string name="archived_empty_text">بایگانی‌هایتان اینجا نمایش داده می‌شود</string>
     <string name="main_fab_cd">شروع گفتگوی جدید</string>
     <string name="main_default_sms_title">دوباره عاشق پیامک‌ شوید</string>
-    <string name="main_default_sms_message">PRSMS را به‌عنوان برنامه پیش‌فرض پیامک انتخاب کنید</string>
+    <string name="main_default_sms_message">پیامک را به‌عنوان برنامهٔ پیش‌فرض پیامک انتخاب کنید</string>
     <string name="main_default_sms_change">تغییر</string>
     <string name="main_permission_required">نیاز به اجازه</string>
-    <string name="main_permission_sms">PRSMS برای ارسال و مشاهده پیام‌ها نیاز به اجازه دارد</string>
-    <string name="main_permission_contacts">PRSMS نیاز به اجازه برای مشاهده مخاطبین شما دارد</string>
+    <string name="main_permission_sms">برنامهٔ پیامک برای ارسال و مشاهدهٔ پیام‌ها به اجازه نیاز دارد</string>
+    <string name="main_permission_contacts">برنامهٔ پیامک برای دیدن مخاطبان به اجازه نیاز دارد</string>
     <string name="main_permission_allow">اجازه</string>
     <string name="drawer_inbox">صندوق ورودی</string>
     <string name="drawer_archived">بایگانی شده</string>
@@ -71,7 +71,7 @@
     <string name="drawer_help">راهنما &amp; بازخورد</string>
     <string name="drawer_invite">دعوت دوستان</string>
     <string name="drawer_plus_banner_summary">ویژگی های جدید شگفت انگیز را باز کرده و از توسعه نرم‌افزار پشتیبانی کنید</string>
-    <string name="rate_title">از PRsms لذت می برید؟</string>
+    <string name="rate_title">از پیامک لذت می‌برید؟</string>
     <string name="rate_summary">علاقه ی خود رابا امتیاز دادن به ما در گوگل پلی به اشتراک بگذارید</string>
     <string name="rate_okay">باشه!</string>
     <string name="rate_dismiss">رد شدن</string>
@@ -260,7 +260,7 @@
     <string name="settings_mms_size_title">فشرده سازی خودکار پیوست ها</string>
     <string name="settings_sync_title">همگام‌سازی پیام‌ها</string>
     <string name="settings_sync_summary">همگام‌سازی مجدد پیام‌ها با پایگاه‌داده بومی پیامک اندروید</string>
-    <string name="settings_about_title">درباره PRSMS</string>
+    <string name="settings_about_title">دربارهٔ پیامک</string>
     <string name="settings_version">نگارش %s</string>
     <string name="settings_logging_enabled">گزارش‌گیری اشکال‌زدایی فعال است</string>
     <string name="settings_logging_disabled">گزارش‌گیری اشکال‌زدایی غیرفعال است</string>
@@ -270,8 +270,8 @@
     <string name="blocking_drop_summary">پیام های ورودی را از فرستنده های مسدود شده به جای مخفی کردن آنها دور بیندازید</string>
     <string name="blocking_conversations">گفتگوهای مسدود شده</string>
     <string name="blocking_manager_title">مدیریت انسداد</string>
-    <string name="blocking_manager_qksms_title">PRSMS</string>
-    <string name="blocking_manager_qksms_summary">عملکرد مسدود کننده داخلی در PRSMS</string>
+    <string name="blocking_manager_qksms_title">پیامک</string>
+    <string name="blocking_manager_qksms_summary">امکانات مسدودسازی داخلی برنامهٔ پیامک</string>
     <string name="blocking_manager_call_blocker_summary">Block spam messages, numbers &amp; unknown calls with blacklist &amp; Schedule</string>
     <string name="blocking_manager_call_control_summary">تماس ها و پیام های خود را بطور خودکار فیلتر کنید! IQ Community به شما اجازه می دهد تا از پیام های ناخواسته توسط اسپمرهای شناخته شده در جامعه جلوگیری کنید</string>
     <string name="blocking_manager_sia_summary">با استفاده از برنامه «آیا باید جواب بدم»، پیام‌ها را از شماره های ناخواسته به طور خودکار فیلتر کنید</string>

@@ -1,33 +1,44 @@
+<div dir="rtl" align="right">
 
+<h1>پیامک</h1>
 
-# PRSMS
+<p><strong>پیامک</strong> یک برنامهٔ متن‌باز اندرویدی برای مدیریت پیامک‌ها و پیام‌های چندرسانه‌ای است. این پروژه فورکی از <a href="https://github.com/herotux/prsms">PRSMS</a> است و اصلاح‌ها و قابلیت‌های افزودهٔ این فورک را هم در بر دارد.</p>
 
+<p><strong>تاریخ‌های جلالی:</strong> از بخش تنظیمات می‌توانید نمایش تاریخ گفتگوها و پیام‌ها را بر پایهٔ تقویم جلالی (شمسی) فعال کنید. تاریخ‌ها با رقم‌های فارسی نمایش داده می‌شوند. این گزینه را می‌توان هر زمان خاموش یا روشن کرد.</p>
 
+<p>آخرین نسخه را از <a href="https://github.com/afshin-ir/prsms-fixed/releases/latest">صفحهٔ انتشارهای پیامک</a> دریافت کنید.</p>
 
-PRSMS is an open source replacement to the [stock messaging app](https://github.com/android/platform_packages_apps_mms) on Android. It is currently available on the [github releases](https://github.com/herotux/prsms/releases) 
+<h2>قابلیت‌ها</h2>
 
+<ul>
+  <li><strong>پیامک و پیام چندرسانه‌ای:</strong> دریافت و ارسال پیامک و MMS، ارسال پیام به یک یا چند گیرنده، و پیوست‌کردن رسانه و فایل.</li>
+  <li><strong>گفتگوها و مخاطبان:</strong> دیدن گفتگوها و جست‌وجو در صندوق ورودی، ساخت گفتگوی تازه، مدیریت گفتگوهای گروهی، و نام‌گذاری گفتگوها.</li>
+  <li><strong>مدیریت گفتگو:</strong> بایگانی و بازگردانی از بایگانی، سنجاق‌کردن، حذف، و تعیین کنش‌های حرکتی برای گفتگوها.</li>
+  <li><strong>مسدودسازی:</strong> مسدودکردن شماره یا نام فرستنده، مشاهدهٔ پیام‌ها و گفتگوهای مسدودشده، و رفع مسدودسازی هر مورد. پیام‌های دریافتی از فرستنده‌های مسدودشده را می‌توان پنهان کرد یا دور انداخت.</li>
+  <li><strong>پشتیبان‌گیری و بازیابی:</strong> تهیهٔ پشتیبان از پیامک‌ها، فهرست شماره‌های مسدودشده و وضعیت گفتگوهای مسدودشده؛ سپس بازیابی آن‌ها روی دستگاه دیگر. بازیابی پیام‌ها نیازمند انتخاب پیامک به‌عنوان برنامهٔ پیش‌فرض است. این قابلیت از MMS پشتیبان نمی‌گیرد.</li>
+  <li><strong>زمان‌بندی و ارسال:</strong> زمان‌بندی ارسال پیام و تعیین درنگ کوتاه پیش از ارسال. همچنین می‌توان پیام‌های بلند را به‌صورت MMS فرستاد و اندازهٔ پیوست‌های MMS را فشرده کرد.</li>
+  <li><strong>اعلان‌ها و پاسخ سریع:</strong> پاسخ‌دادن از اعلان، انتخاب پیش‌نمایش پیام، تنظیم دکمه‌های کنش و روشن‌شدن صفحه برای اعلان‌ها، و سفارشی‌کردن اعلان هر گفتگو.</li>
+  <li><strong>شخصی‌سازی:</strong> پوسته‌ها، حالت شب و حالت سیاه، رنگ خودکار برای مخاطبان، و تنظیم اندازه و ظاهر متن.</li>
+  <li><strong>ابزارهای پیام:</strong> پاسخ‌های آماده، تبدیل خودکار شکلک، حذف خودکار پیام‌های قدیمی، و ابزارک گفتگوها در صفحهٔ اصلی.</li>
+  <li><strong>پشتیبانی از راست‌به‌چپ:</strong> رابط فارسی و نمایش درست متن‌های راست‌به‌چپ و شماره‌ها.</li>
+</ul>
 
-## Reporting bugs
+<h2>قابلیت‌های پیشرفته</h2>
 
-A great bug report contains a description of the problem and steps to reproduce the problem. We need to know what we're looking for and where to look for it.
+<p>برخی امکانات پیشرفته ممکن است به فعال‌سازی <bdi dir="ltr">PRSMS+</bdi> نیاز داشته باشند؛ از جمله مسدودسازی بر پایهٔ واژه یا الگو، پاسخ خودکار، و هدایت خودکار پیام‌ها.</p>
 
-When reporting a bug, please make sure to provide the following information:
-- Steps to reproduce the issue
-- PRSMS version
-- Device / OS information
+<h2>شناسهٔ برنامه و انتقال داده‌ها</h2>
 
-## Translations
+<p>شناسهٔ بستهٔ این فورک <code dir="ltr">ir.afshin.prsms</code> است. بنابراین برنامه در کنار نسخهٔ اصلی PRSMS نصب می‌شود و به‌روزرسانیِ نسخهٔ اصلی نیست. داده‌های خصوصی دو برنامه از هم جدا هستند؛ برای انتقال پیامک‌ها و فهرست مسدودها از امکان پشتیبان‌گیری و بازیابی خود برنامه استفاده کنید.</p>
 
-If you'd like to add translations to PRSMS, please join the project on [Crowdin](https://crowdin.com/project/PRSMS). Translations that are committed directly to source files will not be accepted.
+<h2>گزارش اشکال و مشارکت</h2>
 
-## Thank you
+<p>برای گزارش اشکال، نسخهٔ برنامه، مدل دستگاه و نسخهٔ اندروید را همراه با گام‌های بازتولید مشکل بنویسید. ترجمه‌ها و مشارکت‌های کد نیز خوش‌آمدند.</p>
 
-this app is a fork of qksms and special thanks to ([@Moez Bhatti ](https://github.com/moezbhatti))
+<h2>سپاس و مجوز</h2>
 
-## Contact
+<p>این برنامه بر پایهٔ <a href="https://github.com/herotux/prsms">PRSMS</a> ساخته شده است؛ PRSMS نیز از <a href="https://github.com/moezbhatti/qksms">QKSMS</a> سرچشمه گرفته است. از سازندگان و مشارکت‌کنندگان این پروژه‌ها سپاسگزاریم.</p>
 
-PRSMS is developed and maintained by [freetux](https://github.com/herotux). Feel free to reach out to thefreetux@gmail.com
+<p>کد برنامه تحت مجوز <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPL نسخهٔ ۳</a> منتشر می‌شود. متن مجوز در پروندهٔ <code dir="ltr">LICENSE</code> قرار دارد.</p>
 
-## License
-
-PRSMS is released under the **The GNU General Public License v3.0 (GPLv3)**, which can be found in the `LICENSE` file in the root of this project.
+</div>

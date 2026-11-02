@@ -74,7 +74,7 @@ jobs:
           else
             gh release create "$RELEASE_TAG" "$APK_PATH" \
               --title "PRSMS $RELEASE_TAG" \
-              --notes "Fork release for side-by-side installation with upstream PRSMS. Includes fixes for blocked-conversation ordering and backup saving." \
+              --notes "نسخهٔ فورک پیامک؛ شامل تقویم جلالی، رفع اشکال‌ها و پشتیبان‌گیری از پیامک‌ها و فهرست مسدودها." \
               --target "$GITHUB_SHA"
           fi
 
