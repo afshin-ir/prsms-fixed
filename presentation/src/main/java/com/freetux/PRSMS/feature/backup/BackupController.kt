@@ -20,6 +20,7 @@ package com.freetux.PRSMS.feature.backup
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.view.View
@@ -50,6 +51,7 @@ import javax.inject.Inject
 class BackupController : QkController<BackupView, BackupState, BackupPresenter>(), BackupView {
 
     @Inject lateinit var adapter: BackupAdapter
+    @Inject lateinit var backupRepo: BackupRepository
     @Inject lateinit var dateFormatter: DateFormatter
     @Inject override lateinit var presenter: BackupPresenter
 
@@ -159,6 +161,10 @@ class BackupController : QkController<BackupView, BackupState, BackupPresenter>(
         }
 
         backup.summary = state.lastBackup
+        backupLocation.summary = activity?.getString(
+                if (backupRepo.hasCustomBackupDirectory()) R.string.backup_location_summary_selected
+                else R.string.backup_location_summary_default
+        )
 
         adapter.data = state.backups
 
@@ -188,11 +194,39 @@ class BackupController : QkController<BackupView, BackupState, BackupPresenter>(
 
     override fun fabClicks(): Observable<*> = fab.clicks()
 
+    override fun backupLocationClicks(): Observable<*> = backupLocation.clicks()
+
     override fun requestStoragePermission() {
         ActivityCompat.requestPermissions(activity!!, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 0)
     }
 
     override fun selectFile() = backupFilesDialog.show()
+
+    override fun selectBackupFolder() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+                .addFlags(
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                                Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                )
+        startActivityForResult(intent, REQUEST_BACKUP_FOLDER)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != REQUEST_BACKUP_FOLDER || resultCode != Activity.RESULT_OK) return
+        val uri = data?.data ?: return
+        val permissionFlags = data.flags and
+                (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        try {
+            activity?.contentResolver?.takePersistableUriPermission(uri, permissionFlags)
+            backupRepo.setBackupDirectory(uri.toString())
+            backupLocation.summary = activity?.getString(R.string.backup_location_summary_selected)
+        } catch (e: SecurityException) {
+            backupRepo.setBackupDirectory(null)
+            backupLocation.summary = activity?.getString(R.string.backup_location_summary_default)
+        }
+    }
 
     override fun confirmRestore() = confirmRestoreDialog.show()
 
