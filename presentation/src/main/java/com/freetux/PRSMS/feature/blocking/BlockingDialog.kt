@@ -127,10 +127,10 @@ class BlockingDialog @Inject constructor(
                 .setMessage(message)
                 .setPositiveButton(R.string.button_continue) { _, _ ->
                     if (block) {
-                        markBlocked.execute(MarkBlocked.Params(actionableIds, prefs.blockingManager.get(), null))
+                        markBlocked.execute(MarkBlocked.Params(conversationIds, prefs.blockingManager.get(), null))
                         blockingManager.block(addresses).subscribe()
                     } else {
-                        markUnblocked.execute(actionableIds)
+                        markUnblocked.execute(conversationIds)
                         blockingManager.unblock(addresses).subscribe()
                     }
                 }

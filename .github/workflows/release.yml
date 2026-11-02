@@ -6,6 +6,10 @@ on:
     paths:
       - .release-version
       - .github/workflows/release.yml
+      - presentation/src/main/java/**
+      - presentation/src/main/res/**
+      - domain/src/main/java/**
+      - data/src/main/java/**
       - build.gradle
       - presentation/build.gradle
       - presentation/src/main/java/com/freetux/PRSMS/feature/gallery/GalleryPagerAdapter.kt
