@@ -119,6 +119,14 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.freetux.PRSMS.common.widget.PreferenceView
+                android:id="@+id/backupLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_file_upload_black_24dp"
+                app:title="@string/backup_location_title"
+                app:summary="@string/backup_location_summary_default" />
+
+            <com.freetux.PRSMS.common.widget.PreferenceView
                 android:id="@+id/backup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

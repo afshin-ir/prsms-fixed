@@ -31,9 +31,11 @@ interface BackupView : QkViewContract<BackupState> {
     fun stopRestoreClicks(): Observable<*>
     fun stopRestoreConfirmed(): Observable<*>
     fun fabClicks(): Observable<*>
+    fun backupLocationClicks(): Observable<*>
 
     fun requestStoragePermission()
     fun selectFile()
+    fun selectBackupFolder()
     fun confirmRestore()
     fun stopRestore()
 

@@ -143,6 +143,9 @@
     <string name="gallery_error">نمی‌توان رسانه را بارگذاری کرد</string>
     <string name="gallery_toast_saved">در گالری ذخیره شد</string>
     <string name="backup_title">پشتیبان‌گیری و بازیابی</string>
+    <string name="backup_location_title">پوشهٔ پشتیبان‌گیری</string>
+    <string name="backup_location_summary_default">برای انتخاب محل ذخیرهٔ پشتیبان‌ها بزنید</string>
+    <string name="backup_location_summary_selected">برای تغییر پوشهٔ انتخاب‌شده بزنید</string>
     <string name="backup_backing_up">پشتیبان‌گیری از پیام‌ها</string>
     <string name="backup_restoring">بازگرداندن پشتیبان</string>
     <string name="backup_last">اخرین پشیبان گیری</string>

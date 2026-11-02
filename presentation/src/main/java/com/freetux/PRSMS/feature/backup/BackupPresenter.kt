@@ -124,6 +124,10 @@ class BackupPresenter @Inject constructor(
                 .autoDisposable(view.scope())
                 .subscribe { backupRepo.stopRestore() }
 
+        view.backupLocationClicks()
+                .autoDisposable(view.scope())
+                .subscribe { view.selectBackupFolder() }
+
         view.fabClicks()
                 .withLatestFrom(billingManager.upgradeStatus) { _, upgraded -> upgraded }
                 .autoDisposable(view.scope())

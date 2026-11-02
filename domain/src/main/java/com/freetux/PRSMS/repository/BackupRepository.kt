@@ -33,6 +33,10 @@ interface BackupRepository {
         class Failed : Progress()
     }
 
+    fun setBackupDirectory(uri: String?)
+
+    fun hasCustomBackupDirectory(): Boolean
+
     fun performBackup()
 
     fun getBackupProgress(): Observable<Progress>
