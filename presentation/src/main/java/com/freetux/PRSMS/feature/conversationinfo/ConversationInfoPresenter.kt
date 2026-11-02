@@ -39,12 +39,14 @@ import com.freetux.PRSMS.repository.MessageRepository
 import com.uber.autodispose.android.lifecycle.scope
 import com.uber.autodispose.autoDisposable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.withLatestFrom
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 import javax.inject.Inject
+import timber.log.Timber
 import javax.inject.Named
 
 class ConversationInfoPresenter @Inject constructor(
@@ -141,13 +143,18 @@ class ConversationInfoPresenter @Inject constructor(
                 .autoDisposable(view.scope())
                 .subscribe(view::showNameDialog)
 
-        // Set the conversation title
+        // Save the conversation title on a background thread. Realm instances are thread-confined.
         view.nameChanges()
-                .withLatestFrom(conversation) { name, conversation ->
-                    conversationRepo.setConversationName(conversation.id, name)
+                .withLatestFrom(conversation) { name, conversation -> conversation.id to name }
+                .observeOn(Schedulers.io())
+                .doOnNext { (conversationId, name) ->
+                    conversationRepo.setConversationName(conversationId, name)
                 }
                 .autoDisposable(view.scope())
-                .subscribe()
+                .subscribe(
+                        { },
+                        { error -> Timber.e(error, "Failed to save conversation title") }
+                )
 
         // Show the notifications settings for the conversation
         view.notificationClicks()
