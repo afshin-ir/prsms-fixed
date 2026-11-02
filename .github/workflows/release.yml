@@ -1,15 +1,16 @@
-name: Build and attach release APK
+name: Build and publish signed release APK
 
 on:
-  release:
-    types: [published]
+  push:
+    paths:
+      - .release-version
 
 permissions:
   contents: write
 
 jobs:
   build:
-    name: Build signed APK
+    name: Build and publish signed APK
     runs-on: ubuntu-latest
     steps:
       - name: Check signing secrets
@@ -24,14 +25,20 @@ jobs:
           test -n "$ALIAS_NAME" || { echo "::error::Missing ALIAS_NAME secret"; exit 1; }
           test -n "$ALIAS_PASS" || { echo "::error::Missing ALIAS_PASS secret"; exit 1; }
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up JDK 8
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '8'
           distribution: temurin
           cache: gradle
+
+      - name: Read release version
+        run: |
+          RELEASE_TAG="$(tr -d '[:space:]' < .release-version)"
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Invalid release tag: $RELEASE_TAG"; exit 1; }
+          echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
 
       - name: Restore release signing key
         env:
@@ -52,11 +59,18 @@ jobs:
           test -n "$APK_PATH" || { echo "::error::Gradle did not produce a release APK"; exit 1; }
           echo "APK_PATH=$APK_PATH" >> "$GITHUB_ENV"
 
-      - name: Upload APK to GitHub Release
+      - name: Create GitHub Release and attach APK
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: gh release upload "$RELEASE_TAG" "$APK_PATH" --clobber
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "$APK_PATH" --clobber
+          else
+            gh release create "$RELEASE_TAG" "$APK_PATH" \
+              --title "PRSMS $RELEASE_TAG" \
+              --notes "First stable release of PRSMS with fixes for blocked-message ordering and backup/restore." \
+              --target "$GITHUB_SHA"
+          fi
 
       - name: Remove signing key
         if: always()
