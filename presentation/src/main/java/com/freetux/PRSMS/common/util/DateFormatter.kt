@@ -60,8 +60,14 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
     }
 
     // Force a left-to-right run so Persian RTL reading starts with the day on the right.
+    // Same RTL date order used by v1.0.8 in conversation and blocked lists.
     private fun formatPersianMonthDay(date: PersianDate): String {
-        return "\u200E" + getPersianDateFormat("F j").format(date) + "\u200E"
+        return "\u2067" + getPersianDateFormat("j F").format(date) + "\u2069"
+    }
+
+    // Keep the requested visual sequence "day month" in the open-message timestamp.
+    private fun formatPersianMessageMonthDay(date: PersianDate): String {
+        return formatPersianDate(date, "j F")
     }
 
     private fun formatPersianMessageTimestamp(time: String, date: String? = null): String {
@@ -113,7 +119,7 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
             )
             isSameShamsiYear(thenyear) -> formatPersianMessageTimestamp(
                     time,
-                    formatPersianMonthDay(pdate)
+                    formatPersianMessageMonthDay(pdate)
             )
             else -> formatPersianMessageTimestamp(
                     time,
