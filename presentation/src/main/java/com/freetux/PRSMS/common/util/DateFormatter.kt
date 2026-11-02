@@ -81,7 +81,7 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
     }
 
     private fun formatPersianMessageTimestamp(time: String, date: String): String {
-        return "\u2067در: $date ساعت: \u2066$time\u2069\u2069"
+        return "\u2067$date ساعت: \u2066$time\u2069\u2069"
     }
 
     fun getDetailedTimestamp(date: Long): String {
