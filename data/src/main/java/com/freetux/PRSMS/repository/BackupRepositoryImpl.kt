@@ -27,6 +27,7 @@ import com.freetux.PRSMS.model.BackupFile
 import com.freetux.PRSMS.model.BlockedNumber
 import com.freetux.PRSMS.model.Conversation
 import com.freetux.PRSMS.model.Message
+import com.freetux.PRSMS.common.util.shamsicalendar.PersianDate
 import com.freetux.PRSMS.util.Preferences
 import com.freetux.PRSMS.util.tryOrNull
 import com.squareup.moshi.Moshi
@@ -76,7 +77,8 @@ class BackupRepositoryImpl @Inject constructor(
         val blockedKeywords: List<String> = listOf(),
         val blockedNumberCount: Int = 0,
         val blockedKeywordCount: Int = 0,
-        val blockedConversationCount: Int = 0
+        val blockedConversationCount: Int = 0,
+        val namedConversations: List<BackupNamedConversation> = listOf()
     )
 
     /**
@@ -94,6 +96,11 @@ class BackupRepositoryImpl @Inject constructor(
         val addresses: List<String> = listOf(),
         val blockingClient: Int? = null,
         val blockReason: String? = null
+    )
+
+    data class BackupNamedConversation(
+        val addresses: List<String> = listOf(),
+        val name: String = ""
     )
 
     data class BackupMessage(
@@ -131,6 +138,7 @@ class BackupRepositoryImpl @Inject constructor(
         var messageCount = 0
         var blockedNumbers: List<String> = listOf()
         var blockedConversations: List<BackupBlockedConversation> = listOf()
+        var namedConversations: List<BackupNamedConversation> = listOf()
 
         // Map all the messages and blocked state while the Realm objects are valid.
         val backupMessages = Realm.getDefaultInstance().use { realm ->
@@ -146,6 +154,15 @@ class BackupRepositoryImpl @Inject constructor(
                                 addresses = conversation.recipients.map { it.address },
                                 blockingClient = conversation.blockingClient,
                                 blockReason = conversation.blockReason
+                        )
+                    }
+            namedConversations = realm.where(Conversation::class.java)
+                    .findAll()
+                    .filter { conversation -> conversation.name.isNotBlank() && conversation.recipients.isNotEmpty() }
+                    .map { conversation ->
+                        BackupNamedConversation(
+                                addresses = conversation.recipients.map { it.address },
+                                name = conversation.name
                         )
                     }
 
@@ -170,13 +187,21 @@ class BackupRepositoryImpl @Inject constructor(
                 blockedKeywords = prefs.blockedKeywords.get().toList(),
                 blockedNumberCount = blockedNumbers.size,
                 blockedConversationCount = blockedConversations.size,
-                blockedKeywordCount = prefs.blockedKeywords.get().size
+                blockedKeywordCount = prefs.blockedKeywords.get().size,
+                namedConversations = namedConversations
         )).toByteArray()
 
         val saved = try {
-            val timestamp = SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.getDefault()).format(System.currentTimeMillis())
-            val fileName = "backup-$timestamp.json"
+            val backupDate = PersianDate(System.currentTimeMillis())
+            val jalaliDate = String.format(
+                    Locale.US,
+                    "%04d-%02d-%02d",
+                    backupDate.getShYear(),
+                    backupDate.getShMonth(),
+                    backupDate.getShDay()
+            )
             val directoryUri = prefs.backupDirectoryUri.get().takeIf { it.isNotBlank() }?.let { Uri.parse(it) }
+            val fileName = getUniqueBackupFileName(directoryUri, jalaliDate)
             if (directoryUri == null) {
                 val dir = backupDirectory
                 if (!dir.isDirectory && !dir.mkdirs()) {
@@ -206,6 +231,40 @@ class BackupRepositoryImpl @Inject constructor(
         // Report success only after the file has actually been written.
         backupProgress.onNext(if (saved) BackupRepository.Progress.Finished() else BackupRepository.Progress.Failed())
         Timer().schedule(1000) { backupProgress.onNext(BackupRepository.Progress.Idle()) }
+    }
+
+    private fun getUniqueBackupFileName(directoryUri: Uri?, jalaliDate: String): String {
+        val existingNames = if (directoryUri == null) {
+            backupDirectory.list()?.toSet().orEmpty()
+        } else {
+            val treeId = DocumentsContract.getTreeDocumentId(directoryUri)
+            val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(directoryUri, treeId)
+            val names = mutableSetOf<String>()
+            context.contentResolver.query(
+                    childrenUri,
+                    arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME),
+                    null,
+                    null,
+                    null
+            )?.use { cursor ->
+                val nameColumn = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                while (cursor.moveToNext()) {
+                    cursor.getString(nameColumn)?.let(names::add)
+                }
+            }
+            names
+        }
+
+        val baseName = "Backup SMS ($jalaliDate).json"
+        if (baseName !in existingNames) return baseName
+
+        var index = 2
+        var candidate: String
+        do {
+            candidate = "Backup ($index) SMS ($jalaliDate).json"
+            index++
+        } while (candidate in existingNames)
+        return candidate
     }
 
     private fun messageToBackupMessage(message: Message): BackupMessage = BackupMessage(
@@ -364,6 +423,19 @@ class BackupRepositoryImpl @Inject constructor(
         // Sync the messages
         restoreProgress.onNext(BackupRepository.Progress.Syncing())
         syncRepo.syncMessages()
+
+        // Restore custom conversation titles using recipient addresses, since thread IDs may differ on another device.
+        backup?.namedConversations?.forEach { namedConversation ->
+            if (namedConversation.addresses.isNotEmpty() && namedConversation.name.isNotBlank()) {
+                try {
+                    conversationRepo.getThreadId(namedConversation.addresses)?.let { threadId ->
+                        conversationRepo.setConversationName(threadId, namedConversation.name)
+                    }
+                } catch (e: Exception) {
+                    Timber.w(e, "Unable to restore a conversation title")
+                }
+            }
+        }
 
         // Restore the PRSMS block list and reapply blocked state to conversations.
         backup?.blockedKeywords?.takeIf { it.isNotEmpty() }?.let { keywords ->
