@@ -6,6 +6,9 @@ on:
     paths:
       - .release-version
       - .github/workflows/release.yml
+      - build.gradle
+      - presentation/build.gradle
+      - data/build.gradle
 
 permissions:
   contents: write
