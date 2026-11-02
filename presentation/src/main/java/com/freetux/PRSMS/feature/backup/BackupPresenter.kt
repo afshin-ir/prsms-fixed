@@ -53,7 +53,12 @@ class BackupPresenter @Inject constructor(
         disposables += backupRepo.getBackupProgress()
                 .sample(16, TimeUnit.MILLISECONDS)
                 .distinctUntilChanged()
-                .subscribe { progress -> newState { copy(backupProgress = progress) } }
+                .subscribe { progress ->
+                    newState { copy(backupProgress = progress) }
+                    if (progress is BackupRepository.Progress.Failed) {
+                        context.makeToast(R.string.backup_progress_failed)
+                    }
+                }
 
         disposables += backupRepo.getRestoreProgress()
                 .sample(16, TimeUnit.MILLISECONDS)
@@ -96,7 +101,6 @@ class BackupPresenter @Inject constructor(
                         !upgraded -> context.makeToast(R.string.backup_restore_error_plus)
                         backupProgress.running -> context.makeToast(R.string.backup_restore_error_backup)
                         restoreProgress.running -> context.makeToast(R.string.backup_restore_error_restore)
-                        !permissionManager.hasStorage() -> view.requestStoragePermission()
                         else -> view.selectFile()
                     }
                 }
@@ -126,7 +130,6 @@ class BackupPresenter @Inject constructor(
                 .subscribe { upgraded ->
                     when {
                         !upgraded -> navigator.showQksmsPlusActivity("backup_fab")
-                        !permissionManager.hasStorage() -> view.requestStoragePermission()
                         upgraded -> performBackup.execute(Unit)
                     }
                 }

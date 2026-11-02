@@ -19,7 +19,6 @@
 package com.freetux.PRSMS.repository
 
 import android.content.Context
-import android.os.Environment
 import android.provider.Telephony
 import androidx.core.content.contentValuesOf
 import com.freetux.PRSMS.model.BackupFile
@@ -37,6 +36,7 @@ import okio.buffer
 import okio.source
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
@@ -53,7 +53,13 @@ class BackupRepositoryImpl @Inject constructor(
 ) : BackupRepository {
 
     companion object {
-        private val BACKUP_DIRECTORY = Environment.getExternalStorageDirectory().toString() + "/PRSMS/Backups"
+        private const val BACKUP_DIRECTORY_NAME = "PRSMS/Backups"
+    }
+
+    // App-specific external storage works with scoped storage and needs no storage permission.
+    private val backupDirectory: File by lazy {
+        File(context.getExternalFilesDir(null) ?: context.filesDir, BACKUP_DIRECTORY_NAME)
+                .apply { mkdirs() }
     }
 
     data class Backup(
@@ -118,20 +124,25 @@ class BackupRepositoryImpl @Inject constructor(
         val adapter = moshi.adapter(Backup::class.java).indent("\t")
         val json = adapter.toJson(Backup(messageCount, backupMessages)).toByteArray()
 
-        try {
+        val saved = try {
             // Create the directory and file
-            val dir = File(BACKUP_DIRECTORY).apply { mkdirs() }
-            val timestamp = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(System.currentTimeMillis())
+            val dir = backupDirectory
+            if (!dir.isDirectory && !dir.mkdirs()) {
+                throw IOException("Unable to create backup directory: ${dir.path}")
+            }
+            val timestamp = SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.getDefault()).format(System.currentTimeMillis())
             val file = File(dir, "backup-$timestamp.json")
 
-            // Write the log to the file
-            FileOutputStream(file, true).use { fileOutputStream -> fileOutputStream.write(json) }
+            // Do not append: every backup file must contain exactly one valid JSON document.
+            FileOutputStream(file, false).use { fileOutputStream -> fileOutputStream.write(json) }
+            true
         } catch (e: Exception) {
             Timber.w(e)
+            false
         }
 
-        // Mark the task finished, and set it as Idle a second later
-        backupProgress.onNext(BackupRepository.Progress.Finished())
+        // Report success only after the file has actually been written.
+        backupProgress.onNext(if (saved) BackupRepository.Progress.Finished() else BackupRepository.Progress.Failed())
         Timer().schedule(1000) { backupProgress.onNext(BackupRepository.Progress.Idle()) }
     }
 
@@ -151,8 +162,8 @@ class BackupRepositoryImpl @Inject constructor(
 
     override fun getBackupProgress(): Observable<BackupRepository.Progress> = backupProgress
 
-    override fun getBackups(): Observable<List<BackupFile>> = QkFileObserver(BACKUP_DIRECTORY).observable
-            .map { File(BACKUP_DIRECTORY).listFiles() ?: arrayOf() }
+    override fun getBackups(): Observable<List<BackupFile>> = QkFileObserver(backupDirectory.path).observable
+            .map { backupDirectory.listFiles() ?: arrayOf() }
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.computation())
             .map { files ->

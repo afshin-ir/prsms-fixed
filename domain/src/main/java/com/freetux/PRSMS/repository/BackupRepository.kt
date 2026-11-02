@@ -30,6 +30,7 @@ interface BackupRepository {
         class Saving : Progress(true)
         class Syncing : Progress(true)
         class Finished : Progress(true, false)
+        class Failed : Progress()
     }
 
     fun performBackup()

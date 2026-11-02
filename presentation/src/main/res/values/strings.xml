@@ -176,7 +176,7 @@
     <string name="backup_restore_stop_title">Stop restore</string>
     <string name="backup_restore_stop_message">Messages that have already been restored will remain on your device</string>
     <string name="backup_restore_dialog_title">Backups</string>
-    <string name="backup_restore_dialog_summary" translatable="false">/PRSMS/Backups</string>
+    <string name="backup_restore_dialog_summary" translatable="false">Saved in PRSMS app storage</string>
     <string name="backup_restore_dialog_empty">No backups found</string>
     <plurals name="backup_message_count">
         <item quantity="zero">No messages</item>
@@ -190,6 +190,7 @@
     <string name="backup_progress_saving">Saving backup…</string>
     <string name="backup_progress_syncing">Syncing messages…</string>
     <string name="backup_progress_finished">Finished!</string>
+    <string name="backup_progress_failed">Could not save the backup. Check available storage and try again.</string>
     <string name="backup_notification_channel_name">Backup and restore</string>
 
     <string name="scheduled_title">Scheduled</string>
