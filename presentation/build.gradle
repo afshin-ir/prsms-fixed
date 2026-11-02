@@ -44,7 +44,7 @@ keystorePwd = keystorePwd ?: System.getenv("KEYSTORE_PASS")
 alias = alias ?: System.getenv("ALIAS_NAME")
 pwd = pwd ?: System.getenv("ALIAS_PASS")
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion "30.0.2"
     flavorDimensions "analytics"
 
