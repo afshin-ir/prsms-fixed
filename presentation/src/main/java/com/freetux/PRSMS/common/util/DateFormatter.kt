@@ -59,9 +59,9 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
         return "\u2066" + getPersianDateFormat(pattern).format(date) + "\u2069"
     }
 
-    // Keep the day on the right and the Persian month name immediately to its left.
+    // Force a left-to-right run so Persian RTL reading starts with the day on the right.
     private fun formatPersianMonthDay(date: PersianDate): String {
-        return "\u2067" + getPersianDateFormat("j F").format(date) + "\u2069"
+        return "\u200E" + getPersianDateFormat("F j").format(date) + "\u200E"
     }
 
     private fun formatPersianMessageTimestamp(time: String, date: String? = null): String {
