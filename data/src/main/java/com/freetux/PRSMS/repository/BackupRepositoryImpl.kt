@@ -213,6 +213,11 @@ class BackupRepositoryImpl @Inject constructor(
                 context.contentResolver.openOutputStream(backupUri, "wt")?.use { it.write(json) }
                         ?: throw IOException("Unable to open backup output stream")
             }
+            try {
+                pruneOldBackups(directoryUri, fileName)
+            } catch (cleanupError: Exception) {
+                Timber.w(cleanupError, "Unable to remove older backups")
+            }
             true
         } catch (e: Exception) {
             Timber.w(e)
@@ -222,6 +227,62 @@ class BackupRepositoryImpl @Inject constructor(
         // Report success only after the file has actually been written.
         backupProgress.onNext(if (saved) BackupRepository.Progress.Finished() else BackupRepository.Progress.Failed())
         Timer().schedule(1000) { backupProgress.onNext(BackupRepository.Progress.Idle()) }
+    }
+
+    private data class BackupDocument(val uri: Uri, val name: String, val lastModified: Long)
+
+    private fun isManagedBackup(name: String): Boolean =
+            Regex("^(Backup(?: \\(\\d+\\))? SMS \\(\\d{4}-\\d{2}-\\d{2}\\)|backup-\\d{17})\\.json$", RegexOption.IGNORE_CASE)
+                    .matches(name)
+
+    private fun pruneOldBackups(directoryUri: Uri?, currentFileName: String) {
+        val documents = if (directoryUri == null) {
+            backupDirectory.listFiles()
+                    ?.filter { file -> file.isFile && isManagedBackup(file.name) }
+                    ?.map { file -> BackupDocument(Uri.fromFile(file), file.name, file.lastModified()) }
+                    .orEmpty()
+        } else {
+            val treeId = DocumentsContract.getTreeDocumentId(directoryUri)
+            val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(directoryUri, treeId)
+            val documents = mutableListOf<BackupDocument>()
+            context.contentResolver.query(
+                    childrenUri,
+                    arrayOf(
+                            DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                            DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                            DocumentsContract.Document.COLUMN_LAST_MODIFIED
+                    ),
+                    null,
+                    null,
+                    null
+            )?.use { cursor ->
+                val idColumn = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
+                val nameColumn = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                val modifiedColumn = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_LAST_MODIFIED)
+                while (cursor.moveToNext()) {
+                    val name = cursor.getString(nameColumn) ?: continue
+                    if (!isManagedBackup(name)) continue
+                    val uri = DocumentsContract.buildDocumentUriUsingTree(directoryUri, cursor.getString(idColumn))
+                    val modified = if (cursor.isNull(modifiedColumn)) 0L else cursor.getLong(modifiedColumn)
+                    documents += BackupDocument(uri, name, modified)
+                }
+            }
+            documents
+        }
+
+        documents
+                .sortedWith(compareByDescending<BackupDocument> { it.name == currentFileName }
+                        .thenByDescending { it.lastModified }
+                        .thenByDescending { it.name })
+                .drop(2)
+                .forEach { oldBackup ->
+                    if (directoryUri == null) {
+                        val file = File(oldBackup.uri.path.orEmpty())
+                        if (!file.delete()) Timber.w("Unable to delete old backup: %s", oldBackup.name)
+                    } else if (!DocumentsContract.deleteDocument(context.contentResolver, oldBackup.uri)) {
+                        Timber.w("Unable to delete old backup: %s", oldBackup.name)
+                    }
+                }
     }
 
     private fun getJalaliDate(timestamp: Long): String {
