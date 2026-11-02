@@ -24,6 +24,7 @@ import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -112,7 +113,7 @@ class BlockingController : QkController<BlockingView, BlockingState, BlockingPre
             orientation = LinearLayout.VERTICAL
         }
         val scroll = ScrollView(currentActivity).apply {
-            addView(list, ScrollView.LayoutParams(
+            addView(list, FrameLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             ))
