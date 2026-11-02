@@ -232,4 +232,9 @@ class BackupController : QkController<BackupView, BackupState, BackupPresenter>(
 
     override fun stopRestore() = stopRestoreDialog.show()
 
+
+    companion object {
+        private const val REQUEST_BACKUP_FOLDER = 4107
+    }
+
 }
