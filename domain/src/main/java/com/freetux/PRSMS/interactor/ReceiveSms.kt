@@ -49,7 +49,19 @@ class ReceiveSms @Inject constructor(
                     // Don't continue if the sender is blocked
                     val messages = it.messages
                     val address = messages[0].displayOriginatingAddress
-                    val action = blockingClient.shouldBlock(address).blockingGet()
+                    val senderAction = blockingClient.shouldBlock(address).blockingGet()
+                    val time = messages[0].timestampMillis
+                    val body: String = messages
+                            .mapNotNull { message -> message.displayMessageBody }
+                            .reduce { body, new -> body + new }
+                    val matchedKeyword = prefs.blockedKeywords.get()
+                            .firstOrNull { keyword -> keyword.isNotBlank() && body.contains(keyword, ignoreCase = true) }
+                    val keywordBlocked = senderAction !is BlockingClient.Action.Block && matchedKeyword != null
+                    val action = if (keywordBlocked) {
+                        BlockingClient.Action.Block("keyword:$matchedKeyword")
+                    } else {
+                        senderAction
+                    }
                     val shouldDrop = prefs.drop.get()
                     Timber.v("block=$action, drop=$shouldDrop")
 
@@ -58,10 +70,6 @@ class ReceiveSms @Inject constructor(
                         return@mapNotNull null
                     }
 
-                    val time = messages[0].timestampMillis
-                    val body: String = messages
-                            .mapNotNull { message -> message.displayMessageBody }
-                            .reduce { body, new -> body + new }
 
                     // Add the message to the db
                     val message = messageRepo.insertReceivedSms(it.subId, address, body, time)
@@ -69,7 +77,11 @@ class ReceiveSms @Inject constructor(
                     when (action) {
                         is BlockingClient.Action.Block -> {
                             messageRepo.markRead(message.threadId)
-                            conversationRepo.markBlocked(listOf(message.threadId), prefs.blockingManager.get(), action.reason)
+                            conversationRepo.markBlocked(
+                                    listOf(message.threadId),
+                                    if (keywordBlocked) Preferences.BLOCKING_MANAGER_KEYWORDS else prefs.blockingManager.get(),
+                                    action.reason
+                            )
                         }
                         is BlockingClient.Action.Unblock -> conversationRepo.markUnblocked(message.threadId)
                         else -> Unit

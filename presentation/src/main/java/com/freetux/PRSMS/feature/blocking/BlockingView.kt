@@ -26,9 +26,11 @@ interface BlockingView : QkViewContract<BlockingState> {
     val blockingManagerIntent: Observable<*>
     val blockedNumbersIntent: Observable<*>
     val blockedMessagesIntent: Observable<*>
+    val blockedKeywordsIntent: Observable<*>
     val dropClickedIntent: Observable<*>
 
     fun openBlockingManager()
     fun openBlockedNumbers()
     fun openBlockedMessages()
+    fun openBlockedKeywords()
 }

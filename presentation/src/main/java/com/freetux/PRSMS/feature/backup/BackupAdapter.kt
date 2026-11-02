@@ -57,7 +57,8 @@ class BackupAdapter @Inject constructor(
         val messageSummary = context.resources.getQuantityString(R.plurals.backup_message_count, count, count)
         val numberSummary = context.resources.getQuantityString(R.plurals.backup_blocked_number_count, backup.blockedNumbers, backup.blockedNumbers)
         val conversationSummary = context.resources.getQuantityString(R.plurals.backup_blocked_conversation_count, backup.blockedConversations, backup.blockedConversations)
-        holder.messages.text = context.getString(R.string.backup_contents_summary, messageSummary, numberSummary, conversationSummary)
+        val keywordSummary = context.resources.getQuantityString(R.plurals.backup_blocked_keyword_count, backup.blockedKeywords, backup.blockedKeywords)
+        holder.messages.text = context.getString(R.string.backup_contents_summary, messageSummary, numberSummary, conversationSummary, keywordSummary)
         holder.size.text = Formatter.formatFileSize(context, backup.size)
     }
 

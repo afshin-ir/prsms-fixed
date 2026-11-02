@@ -76,6 +76,7 @@ class Preferences @Inject constructor(
         const val BLOCKING_MANAGER_CC = 1
         const val BLOCKING_MANAGER_SIA = 2
         const val BLOCKING_MANAGER_CB = 3
+        const val BLOCKING_MANAGER_KEYWORDS = 4
     }
 
     // Internal
@@ -93,15 +94,16 @@ class Preferences @Inject constructor(
         true -> NIGHT_MODE_SYSTEM
         false -> NIGHT_MODE_OFF
     })
-    val shamsiDate = rxPrefs.getBoolean("shamsiDate", false)
+    val shamsiDate = rxPrefs.getBoolean("shamsiDate", true)
     val nightStart = rxPrefs.getString("nightStart", "18:00")
     val nightEnd = rxPrefs.getString("nightEnd", "6:00")
     val black = rxPrefs.getBoolean("black", false)
     val autoColor = rxPrefs.getBoolean("autoColor", true)
-    val systemFont = rxPrefs.getBoolean("systemFont", false)
+    val systemFont = rxPrefs.getBoolean("systemFont", true)
     val textSize = rxPrefs.getInteger("textSize", TEXT_SIZE_NORMAL)
     val blockingManager = rxPrefs.getInteger("blockingManager", BLOCKING_MANAGER_QKSMS)
     val drop = rxPrefs.getBoolean("drop", false)
+    val blockedKeywords = rxPrefs.getStringSet("blockedKeywords", emptySet())
     val notifAction1 = rxPrefs.getInteger("notifAction1", NOTIFICATION_ACTION_READ)
     val notifAction2 = rxPrefs.getInteger("notifAction2", NOTIFICATION_ACTION_REPLY)
     val notifAction3 = rxPrefs.getInteger("notifAction3", NOTIFICATION_ACTION_NONE)
@@ -111,7 +113,7 @@ class Preferences @Inject constructor(
     val swipeRight = rxPrefs.getInteger("swipeRight", SWIPE_ACTION_ARCHIVE)
     val swipeLeft = rxPrefs.getInteger("swipeLeft", SWIPE_ACTION_ARCHIVE)
     val autoEmoji = rxPrefs.getBoolean("autoEmoji", true)
-    val delivery = rxPrefs.getBoolean("delivery", false)
+    val delivery = rxPrefs.getBoolean("delivery", true)
     val signature = rxPrefs.getString("signature", "")
     val unicode = rxPrefs.getBoolean("unicode", false)
     val mobileOnly = rxPrefs.getBoolean("mobileOnly", false)

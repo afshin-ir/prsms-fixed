@@ -44,7 +44,24 @@ class BlockingDialog @Inject constructor(
 ) {
 
     fun show(activity: Activity, conversationIds: List<Long>, block: Boolean) = GlobalScope.launch {
-        val addresses = conversationIds.toLongArray()
+        val conversations = conversationIds.toLongArray()
+                .let { conversationRepo.getConversations(*it) }
+                .toList()
+        val keywordConversationIds = if (block) {
+            emptyList()
+        } else {
+            conversations.filter { it.blockingClient == Preferences.BLOCKING_MANAGER_KEYWORDS }.map { it.id }
+        }
+        if (keywordConversationIds.isNotEmpty()) {
+            markUnblocked.execute(keywordConversationIds)
+        }
+
+        val actionableIds = conversationIds.filterNot { it in keywordConversationIds }
+        if (actionableIds.isEmpty()) {
+            return@launch
+        }
+
+        val addresses = actionableIds.toLongArray()
                 .let { conversationRepo.getConversations(*it) }
                 .flatMap { conversation -> conversation.recipients }
                 .map { it.address }
@@ -57,22 +74,22 @@ class BlockingDialog @Inject constructor(
         if (blockingManager.getClientCapability() == BlockingClient.Capability.BLOCK_WITHOUT_PERMISSION) {
             // If we can block/unblock in the external manager, then just fire that off and exit
             if (block) {
-                markBlocked.execute(MarkBlocked.Params(conversationIds, prefs.blockingManager.get(), null))
+                markBlocked.execute(MarkBlocked.Params(actionableIds, prefs.blockingManager.get(), null))
                 blockingManager.block(addresses).subscribe()
             } else {
-                markUnblocked.execute(conversationIds)
+                markUnblocked.execute(actionableIds)
                 blockingManager.unblock(addresses).subscribe()
             }
         } else if (block == allBlocked(addresses)) {
             // If all of the addresses are already in their correct state in the blocking manager, just marked the
             // conversations blocked and exit
             when (block) {
-                true -> markBlocked.execute(MarkBlocked.Params(conversationIds, prefs.blockingManager.get(), null))
-                false -> markUnblocked.execute(conversationIds)
+                true -> markBlocked.execute(MarkBlocked.Params(actionableIds, prefs.blockingManager.get(), null))
+                false -> markUnblocked.execute(actionableIds)
             }
         } else {
             // Otherwise, show the UI that lets the users know they need to mark the number as blocked in the client
-            showDialog(activity, conversationIds, addresses, block)
+            showDialog(activity, actionableIds, addresses, block)
         }
     }
 
@@ -110,10 +127,10 @@ class BlockingDialog @Inject constructor(
                 .setMessage(message)
                 .setPositiveButton(R.string.button_continue) { _, _ ->
                     if (block) {
-                        markBlocked.execute(MarkBlocked.Params(conversationIds, prefs.blockingManager.get(), null))
+                        markBlocked.execute(MarkBlocked.Params(actionableIds, prefs.blockingManager.get(), null))
                         blockingManager.block(addresses).subscribe()
                     } else {
-                        markUnblocked.execute(conversationIds)
+                        markUnblocked.execute(actionableIds)
                         blockingManager.unblock(addresses).subscribe()
                     }
                 }

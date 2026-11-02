@@ -71,7 +71,9 @@ class BackupRepositoryImpl @Inject constructor(
         val messages: List<BackupMessage> = listOf(),
         val blockedNumbers: List<String> = listOf(),
         val blockedConversations: List<BackupBlockedConversation> = listOf(),
+        val blockedKeywords: List<String> = listOf(),
         val blockedNumberCount: Int = 0,
+        val blockedKeywordCount: Int = 0,
         val blockedConversationCount: Int = 0
     )
 
@@ -82,7 +84,8 @@ class BackupRepositoryImpl @Inject constructor(
     data class BackupMetadata(
         val messageCount: Int = 0,
         val blockedNumberCount: Int = 0,
-        val blockedConversationCount: Int = 0
+        val blockedConversationCount: Int = 0,
+        val blockedKeywordCount: Int = 0
     )
 
     data class BackupBlockedConversation(
@@ -156,8 +159,10 @@ class BackupRepositoryImpl @Inject constructor(
                 messages = backupMessages,
                 blockedNumbers = blockedNumbers,
                 blockedConversations = blockedConversations,
+                blockedKeywords = prefs.blockedKeywords.get().toList(),
                 blockedNumberCount = blockedNumbers.size,
-                blockedConversationCount = blockedConversations.size
+                blockedConversationCount = blockedConversations.size,
+                blockedKeywordCount = prefs.blockedKeywords.get().size
         )).toByteArray()
 
         val saved = try {
@@ -213,7 +218,7 @@ class BackupRepositoryImpl @Inject constructor(
                     val date = file.lastModified()
                     val messages = backup.messageCount
                     val size = file.length()
-                    BackupFile(path, date, messages, size, backup.blockedNumberCount, backup.blockedConversationCount)
+                    BackupFile(path, date, messages, size, backup.blockedNumberCount, backup.blockedConversationCount, backup.blockedKeywordCount)
                 }
             }
             .map { files -> files.sortedByDescending { file -> file.date } }
@@ -277,6 +282,9 @@ class BackupRepositoryImpl @Inject constructor(
         syncRepo.syncMessages()
 
         // Restore the PRSMS block list and reapply blocked state to conversations.
+        backup?.blockedKeywords?.takeIf { it.isNotEmpty() }?.let { keywords ->
+            prefs.blockedKeywords.set(prefs.blockedKeywords.get() + keywords)
+        }
         backup?.blockedNumbers?.takeIf { it.isNotEmpty() }?.let { addresses ->
             blockingRepo.blockNumber(*addresses.toTypedArray())
         }

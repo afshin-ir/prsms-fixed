@@ -73,6 +73,10 @@ class BlockingPresenter @Inject constructor(
                 .autoDisposable(view.scope())
                 .subscribe { view.openBlockedMessages() }
 
+        view.blockedKeywordsIntent
+                .autoDisposable(view.scope())
+                .subscribe { view.openBlockedKeywords() }
+
         view.dropClickedIntent
                 .autoDisposable(view.scope())
                 .subscribe { prefs.drop.set(!prefs.drop.get()) }

@@ -167,7 +167,11 @@
         <item quantity="one">%d گفتگوی مسدودشده</item>
         <item quantity="other">%d گفتگوی مسدودشده</item>
     </plurals>
-    <string name="backup_contents_summary">%1$s · %2$s · %3$s</string>
+    <plurals name="backup_blocked_keyword_count">
+        <item quantity="one">%d کلیدواژهٔ مسدودشده</item>
+        <item quantity="other">%d کلیدواژهٔ مسدودشده</item>
+    </plurals>
+    <string name="backup_contents_summary">%1$s · %2$s · %3$s · %4$s</string>
     <plurals name="backup_message_count">
         <item quantity="one">%d پیام</item>
         <item quantity="other">%d پیام</item>
@@ -268,6 +272,13 @@
     <string name="blocking_title">انسداد</string>
     <string name="blocking_drop_title">پیام‌ها را دور بینداز</string>
     <string name="blocking_drop_summary">پیام های ورودی را از فرستنده های مسدود شده به جای مخفی کردن آنها دور بیندازید</string>
+    <string name="blocking_keywords_title">کلیدواژه‌های مسدودشده</string>
+    <string name="blocking_keywords_summary">مدیریت واژه‌ها یا عبارت‌هایی که پیام‌های دریافتی را مسدود می‌کنند</string>
+    <string name="blocking_keywords_match_summary">پیام دریافتی که یکی از واژه‌ها یا عبارت‌های این فهرست را داشته باشد مسدود می‌شود. بزرگی و کوچکی حروف لاتین در تطبیق نادیده گرفته می‌شود.</string>
+    <string name="blocking_keywords_add">افزودن کلیدواژه</string>
+    <string name="blocking_keywords_remove">حذف موارد انتخاب‌شده</string>
+    <string name="blocking_keywords_hint">واژه یا عبارت</string>
+    <string name="blocking_keywords_save">ذخیره</string>
     <string name="blocking_conversations">گفتگوهای مسدود شده</string>
     <string name="blocking_manager_title">مدیریت انسداد</string>
     <string name="blocking_manager_qksms_title">پیامک</string>

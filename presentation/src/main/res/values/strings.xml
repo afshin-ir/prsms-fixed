@@ -188,7 +188,12 @@
         <item quantity="one">%d blocked conversation</item>
         <item quantity="other">%d blocked conversations</item>
     </plurals>
-    <string name="backup_contents_summary">%1$s · %2$s · %3$s</string>
+    <plurals name="backup_blocked_keyword_count">
+        <item quantity="zero">No blocked keywords</item>
+        <item quantity="one">%d blocked keyword</item>
+        <item quantity="other">%d blocked keywords</item>
+    </plurals>
+    <string name="backup_contents_summary">%1$s · %2$s · %3$s · %4$s</string>
     <plurals name="backup_message_count">
         <item quantity="zero">No messages</item>
         <item quantity="one">%d message</item>
@@ -297,6 +302,13 @@
     <string name="blocking_title">Blocking</string>
     <string name="blocking_drop_title">Drop messages</string>
     <string name="blocking_drop_summary">Drop incoming messages from blocked senders instead of hiding them</string>
+    <string name="blocking_keywords_title">Blocked keywords</string>
+    <string name="blocking_keywords_summary">Manage words or phrases that should block incoming messages</string>
+    <string name="blocking_keywords_match_summary">Incoming messages containing any listed word or phrase are blocked. Matching ignores letter case.</string>
+    <string name="blocking_keywords_add">Add keyword</string>
+    <string name="blocking_keywords_remove">Remove selected</string>
+    <string name="blocking_keywords_hint">Word or phrase</string>
+    <string name="blocking_keywords_save">Save</string>
     <string name="blocking_conversations">Blocked conversations</string>
 
     <string name="blocking_manager_title">Blocking Manager</string>
