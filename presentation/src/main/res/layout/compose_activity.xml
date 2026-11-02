@@ -186,6 +186,7 @@
 
     <com.freetux.PRSMS.common.widget.QkTextView
         android:id="@+id/scheduledTime"
+        android:textDirection="ltr"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
