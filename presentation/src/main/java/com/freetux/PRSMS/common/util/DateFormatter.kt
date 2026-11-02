@@ -51,8 +51,12 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
     }
 
     private fun getPersianDateFormat(pattern: String): PersianDateFormat {
-        var newpattern = pattern
-        return PersianDateFormat(newpattern,PersianDateFormat.PersianDateNumberCharacter.FARSI)
+        return PersianDateFormat(pattern, PersianDateFormat.PersianDateNumberCharacter.FARSI)
+    }
+
+    // Keep numeric date fields in a predictable left-to-right sequence inside RTL layouts.
+    private fun formatPersianDate(date: PersianDate, pattern: String): String {
+        return "\u2066" + getPersianDateFormat(pattern).format(date) + "\u2069"
     }
 
     fun getDetailedTimestamp(date: Long): String {
@@ -124,8 +128,8 @@ class DateFormatter @Inject constructor(val context: Context, private val prefs:
             return when {
                 now.isSameDay(then) -> getFormatter("h:mm a").format(date)
                 now.isSameWeek(then) -> getPersianDateFormat("l").format(pdate)
-                isSameShamsiYear(thenyear) -> getPersianDateFormat("F").format(pdate) + " " +  getPersianDateFormat("d").format(pdate)
-                else -> getPersianDateFormat("Y/m/d").format(pdate)
+                isSameShamsiYear(thenyear) -> formatPersianDate(pdate, "F j")
+                else -> formatPersianDate(pdate, "Y/n/j")
             }
 
 
