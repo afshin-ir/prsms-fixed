@@ -48,6 +48,7 @@ import io.reactivex.subjects.Subject
 import kotlinx.android.synthetic.main.backup_controller.*
 import kotlinx.android.synthetic.main.backup_list_dialog.view.*
 import kotlinx.android.synthetic.main.preference_view.view.*
+import kotlinx.android.synthetic.main.settings_switch_widget.view.checkbox
 import javax.inject.Inject
 
 class BackupController : QkController<BackupView, BackupState, BackupPresenter>(), BackupView {
