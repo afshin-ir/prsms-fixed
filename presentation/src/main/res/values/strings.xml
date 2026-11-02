@@ -18,7 +18,7 @@
   -->
 <resources>
 
-    <string name="app_name" translatable="false">PRSMS (afshin-ir)</string>
+    <string name="app_name" translatable="false">PRSMS</string>
 
     <string name="shortcut_compose_long_label">New conversation</string>
     <string name="shortcut_compose_short_label">Compose</string>
@@ -178,6 +178,17 @@
     <string name="backup_restore_dialog_title">Backups</string>
     <string name="backup_restore_dialog_summary" translatable="false">Saved in PRSMS app storage</string>
     <string name="backup_restore_dialog_empty">No backups found</string>
+    <plurals name="backup_blocked_number_count">
+        <item quantity="zero">No blocked numbers</item>
+        <item quantity="one">%d blocked number</item>
+        <item quantity="other">%d blocked numbers</item>
+    </plurals>
+    <plurals name="backup_blocked_conversation_count">
+        <item quantity="zero">No blocked conversations</item>
+        <item quantity="one">%d blocked conversation</item>
+        <item quantity="other">%d blocked conversations</item>
+    </plurals>
+    <string name="backup_contents_summary">%1$s · %2$s · %3$s</string>
     <plurals name="backup_message_count">
         <item quantity="zero">No messages</item>
         <item quantity="one">%d message</item>

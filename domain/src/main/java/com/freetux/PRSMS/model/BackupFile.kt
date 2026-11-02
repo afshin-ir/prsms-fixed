@@ -22,5 +22,7 @@ data class BackupFile(
     val path: String,
     val date: Long,
     val messages: Int,
-    val size: Long
+    val size: Long,
+    val blockedNumbers: Int = 0,
+    val blockedConversations: Int = 0
 )

@@ -159,6 +159,15 @@
     <string name="backup_restore_stop_message">پیام‌هایی که قبلا بازگردانی شده‌اند در دستگاه شما باقی خواهند ماند</string>
     <string name="backup_restore_dialog_title">پشتیبان‌ها</string>
     <string name="backup_restore_dialog_empty">نسخه پشتیبانی یافت نشد</string>
+    <plurals name="backup_blocked_number_count">
+        <item quantity="one">%d شمارهٔ مسدودشده</item>
+        <item quantity="other">%d شمارهٔ مسدودشده</item>
+    </plurals>
+    <plurals name="backup_blocked_conversation_count">
+        <item quantity="one">%d گفتگوی مسدودشده</item>
+        <item quantity="other">%d گفتگوی مسدودشده</item>
+    </plurals>
+    <string name="backup_contents_summary">%1$s · %2$s · %3$s</string>
     <plurals name="backup_message_count">
         <item quantity="one">%d پیام</item>
         <item quantity="other">%d پیام</item>

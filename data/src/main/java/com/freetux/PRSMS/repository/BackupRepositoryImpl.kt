@@ -22,6 +22,8 @@ import android.content.Context
 import android.provider.Telephony
 import androidx.core.content.contentValuesOf
 import com.freetux.PRSMS.model.BackupFile
+import com.freetux.PRSMS.model.BlockedNumber
+import com.freetux.PRSMS.model.Conversation
 import com.freetux.PRSMS.model.Message
 import com.freetux.PRSMS.util.Preferences
 import com.freetux.PRSMS.util.QkFileObserver
@@ -49,7 +51,9 @@ class BackupRepositoryImpl @Inject constructor(
     private val context: Context,
     private val moshi: Moshi,
     private val prefs: Preferences,
-    private val syncRepo: SyncRepository
+    private val syncRepo: SyncRepository,
+    private val blockingRepo: BlockingRepository,
+    private val conversationRepo: ConversationRepository
 ) : BackupRepository {
 
     companion object {
@@ -64,7 +68,11 @@ class BackupRepositoryImpl @Inject constructor(
 
     data class Backup(
         val messageCount: Int = 0,
-        val messages: List<BackupMessage> = listOf()
+        val messages: List<BackupMessage> = listOf(),
+        val blockedNumbers: List<String> = listOf(),
+        val blockedConversations: List<BackupBlockedConversation> = listOf(),
+        val blockedNumberCount: Int = 0,
+        val blockedConversationCount: Int = 0
     )
 
     /**
@@ -72,7 +80,15 @@ class BackupRepositoryImpl @Inject constructor(
      * needing to parse the entire file
      */
     data class BackupMetadata(
-        val messageCount: Int = 0
+        val messageCount: Int = 0,
+        val blockedNumberCount: Int = 0,
+        val blockedConversationCount: Int = 0
+    )
+
+    data class BackupBlockedConversation(
+        val addresses: List<String> = listOf(),
+        val blockingClient: Int? = null,
+        val blockReason: String? = null
     )
 
     data class BackupMessage(
@@ -102,12 +118,25 @@ class BackupRepositoryImpl @Inject constructor(
         if (isBackupOrRestoreRunning()) return
 
         var messageCount = 0
+        var blockedNumbers: List<String> = listOf()
+        var blockedConversations: List<BackupBlockedConversation> = listOf()
 
-        // Map all the messages into our object we'll use for the Json mapping
+        // Map all the messages and blocked state while the Realm objects are valid.
         val backupMessages = Realm.getDefaultInstance().use { realm ->
             // Get the messages from realm
             val messages = realm.where(Message::class.java).sort("date").findAll().createSnapshot()
             messageCount = messages.size
+            blockedNumbers = realm.where(BlockedNumber::class.java).findAll().map { it.address }
+            blockedConversations = realm.where(Conversation::class.java)
+                    .equalTo("blocked", true)
+                    .findAll()
+                    .map { conversation ->
+                        BackupBlockedConversation(
+                                addresses = conversation.recipients.map { it.address },
+                                blockingClient = conversation.blockingClient,
+                                blockReason = conversation.blockReason
+                        )
+                    }
 
             // Map the messages to the new format
             messages.mapIndexed { index, message ->
@@ -122,7 +151,14 @@ class BackupRepositoryImpl @Inject constructor(
 
         // Convert the data to json
         val adapter = moshi.adapter(Backup::class.java).indent("\t")
-        val json = adapter.toJson(Backup(messageCount, backupMessages)).toByteArray()
+        val json = adapter.toJson(Backup(
+                messageCount = messageCount,
+                messages = backupMessages,
+                blockedNumbers = blockedNumbers,
+                blockedConversations = blockedConversations,
+                blockedNumberCount = blockedNumbers.size,
+                blockedConversationCount = blockedConversations.size
+        )).toByteArray()
 
         val saved = try {
             // Create the directory and file
@@ -177,7 +213,7 @@ class BackupRepositoryImpl @Inject constructor(
                     val date = file.lastModified()
                     val messages = backup.messageCount
                     val size = file.length()
-                    BackupFile(path, date, messages, size)
+                    BackupFile(path, date, messages, size, backup.blockedNumberCount, backup.blockedConversationCount)
                 }
             }
             .map { files -> files.sortedByDescending { file -> file.date } }
@@ -239,6 +275,21 @@ class BackupRepositoryImpl @Inject constructor(
         // Sync the messages
         restoreProgress.onNext(BackupRepository.Progress.Syncing())
         syncRepo.syncMessages()
+
+        // Restore the PRSMS block list and reapply blocked state to conversations.
+        backup?.blockedNumbers?.takeIf { it.isNotEmpty() }?.let { addresses ->
+            blockingRepo.blockNumber(*addresses.toTypedArray())
+        }
+        backup?.blockedConversations?.forEach { blockedConversation ->
+            val threadId = conversationRepo.getThreadId(blockedConversation.addresses)
+            if (threadId != null) {
+                conversationRepo.markBlocked(
+                        listOf(threadId),
+                        blockedConversation.blockingClient ?: 0,
+                        blockedConversation.blockReason
+                )
+            }
+        }
 
         // Mark the task finished, and set it as Idle a second later
         restoreProgress.onNext(BackupRepository.Progress.Finished())
