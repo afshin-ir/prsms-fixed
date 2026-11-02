@@ -19,6 +19,8 @@
 package com.freetux.PRSMS.repository
 
 import android.content.Context
+import android.net.Uri
+import android.provider.DocumentsContract
 import android.provider.Telephony
 import androidx.core.content.contentValuesOf
 import com.freetux.PRSMS.model.BackupFile
@@ -26,7 +28,6 @@ import com.freetux.PRSMS.model.BlockedNumber
 import com.freetux.PRSMS.model.Conversation
 import com.freetux.PRSMS.model.Message
 import com.freetux.PRSMS.util.Preferences
-import com.freetux.PRSMS.util.QkFileObserver
 import com.freetux.PRSMS.util.tryOrNull
 import com.squareup.moshi.Moshi
 import io.reactivex.Observable
@@ -39,9 +40,10 @@ import okio.source
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
-import java.io.FileOutputStream
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.concurrent.schedule
@@ -116,6 +118,12 @@ class BackupRepositoryImpl @Inject constructor(
 
     @Volatile private var stopFlag: Boolean = false
 
+    override fun setBackupDirectory(uri: String?) {
+        prefs.backupDirectoryUri.set(uri.orEmpty())
+    }
+
+    override fun hasCustomBackupDirectory(): Boolean = prefs.backupDirectoryUri.get().isNotBlank()
+
     override fun performBackup() {
         // If a backup or restore is already running, don't do anything
         if (isBackupOrRestoreRunning()) return
@@ -166,16 +174,29 @@ class BackupRepositoryImpl @Inject constructor(
         )).toByteArray()
 
         val saved = try {
-            // Create the directory and file
-            val dir = backupDirectory
-            if (!dir.isDirectory && !dir.mkdirs()) {
-                throw IOException("Unable to create backup directory: ${dir.path}")
-            }
             val timestamp = SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.getDefault()).format(System.currentTimeMillis())
-            val file = File(dir, "backup-$timestamp.json")
-
-            // Do not append: every backup file must contain exactly one valid JSON document.
-            FileOutputStream(file, false).use { fileOutputStream -> fileOutputStream.write(json) }
+            val fileName = "backup-$timestamp.json"
+            val directoryUri = prefs.backupDirectoryUri.get().takeIf { it.isNotBlank() }?.let { Uri.parse(it) }
+            if (directoryUri == null) {
+                val dir = backupDirectory
+                if (!dir.isDirectory && !dir.mkdirs()) {
+                    throw IOException("Unable to create backup directory: ${dir.path}")
+                }
+                File(dir, fileName).outputStream().use { it.write(json) }
+            } else {
+                val parentUri = DocumentsContract.buildDocumentUriUsingTree(
+                        directoryUri,
+                        DocumentsContract.getTreeDocumentId(directoryUri)
+                )
+                val backupUri = DocumentsContract.createDocument(
+                        context.contentResolver,
+                        parentUri,
+                        "application/json",
+                        fileName
+                ) ?: throw IOException("Unable to create backup in selected folder")
+                context.contentResolver.openOutputStream(backupUri, "wt")?.use { it.write(json) }
+                        ?: throw IOException("Unable to open backup output stream")
+            }
             true
         } catch (e: Exception) {
             Timber.w(e)
@@ -203,25 +224,84 @@ class BackupRepositoryImpl @Inject constructor(
 
     override fun getBackupProgress(): Observable<BackupRepository.Progress> = backupProgress
 
-    override fun getBackups(): Observable<List<BackupFile>> = QkFileObserver(backupDirectory.path).observable
-            .map { backupDirectory.listFiles() ?: arrayOf() }
-            .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.computation())
-            .map { files ->
-                files.mapNotNull { file ->
-                    val adapter = moshi.adapter(BackupMetadata::class.java)
-                    val backup = tryOrNull(false) {
-                        file.source().buffer().use(adapter::fromJson)
-                    } ?: return@mapNotNull null
+    override fun getBackups(): Observable<List<BackupFile>> =
+            Observable.interval(0, 5, TimeUnit.SECONDS, Schedulers.io())
+                    .map {
+                        val files = backupDirectory.listFiles()
+                                ?.filter { file -> file.isFile && file.name.endsWith(".json") }
+                                ?.mapNotNull(::readBackupFile)
+                                .orEmpty()
+                        val selected = prefs.backupDirectoryUri.get()
+                                .takeIf { it.isNotBlank() }
+                                ?.let { uri -> readBackupTree(Uri.parse(uri)) }
+                                .orEmpty()
+                        (files + selected).distinctBy { it.path }.sortedByDescending { it.date }
+                    }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.computation())
 
-                    val path = file.path
-                    val date = file.lastModified()
-                    val messages = backup.messageCount
-                    val size = file.length()
-                    BackupFile(path, date, messages, size, backup.blockedNumberCount, backup.blockedConversationCount, backup.blockedKeywordCount)
+    private fun readBackupFile(file: File): BackupFile? =
+            readBackupMetadata(file.path, file.lastModified(), file.length()) { file.inputStream() }
+
+    private fun readBackupMetadata(
+            path: String,
+            date: Long,
+            size: Long,
+            openStream: () -> InputStream?
+    ): BackupFile? {
+        val input = tryOrNull(false) { openStream() } ?: return null
+        val backup = tryOrNull(false) {
+            input.source().buffer().use(moshi.adapter(BackupMetadata::class.java)::fromJson)
+        } ?: return null
+
+        return BackupFile(
+                path,
+                date,
+                backup.messageCount,
+                size,
+                backup.blockedNumberCount,
+                backup.blockedConversationCount,
+                backup.blockedKeywordCount
+        )
+    }
+
+    private fun readBackupTree(treeUri: Uri): List<BackupFile> {
+        val treeId = tryOrNull(false) { DocumentsContract.getTreeDocumentId(treeUri) } ?: return emptyList()
+        val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, treeId)
+        val files = mutableListOf<BackupFile>()
+        try {
+            context.contentResolver.query(
+                    childrenUri,
+                    arrayOf(
+                            DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                            DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                            DocumentsContract.Document.COLUMN_LAST_MODIFIED,
+                            DocumentsContract.Document.COLUMN_SIZE
+                    ),
+                    null,
+                    null,
+                    null
+            )?.use { cursor ->
+                val idColumn = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
+                val nameColumn = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                val dateColumn = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_LAST_MODIFIED)
+                val sizeColumn = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_SIZE)
+                while (cursor.moveToNext()) {
+                    val name = cursor.getString(nameColumn) ?: continue
+                    if (!name.endsWith(".json", ignoreCase = true)) continue
+                    val documentUri = DocumentsContract.buildDocumentUriUsingTree(treeUri, cursor.getString(idColumn))
+                    val date = if (cursor.isNull(dateColumn)) 0L else cursor.getLong(dateColumn)
+                    val size = if (cursor.isNull(sizeColumn)) 0L else cursor.getLong(sizeColumn)
+                    readBackupMetadata(documentUri.toString(), date, size) {
+                        context.contentResolver.openInputStream(documentUri)
+                    }?.let(files::add)
                 }
             }
-            .map { files -> files.sortedByDescending { file -> file.date } }
+        } catch (e: Exception) {
+            Timber.w(e)
+        }
+        return files
+    }
 
     override fun performRestore(filePath: String) {
         // If a backupFile or restore is already running, don't do anything
@@ -229,8 +309,12 @@ class BackupRepositoryImpl @Inject constructor(
 
         restoreProgress.onNext(BackupRepository.Progress.Parsing())
 
-        val file = File(filePath)
-        val backup = file.source().buffer().use { source ->
+        val backupInput = if (filePath.startsWith("content://")) {
+            context.contentResolver.openInputStream(Uri.parse(filePath))
+        } else {
+            File(filePath).inputStream()
+        } ?: throw IOException("Unable to open backup")
+        val backup = backupInput.source().buffer().use { source ->
             moshi.adapter(Backup::class.java).fromJson(source)
         }
 
