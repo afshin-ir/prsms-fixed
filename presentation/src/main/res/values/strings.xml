@@ -306,7 +306,8 @@
     <string name="blocking_keywords_summary">Manage words or phrases that should block incoming messages</string>
     <string name="blocking_keywords_match_summary">Incoming messages containing any listed word or phrase are blocked. Matching ignores letter case.</string>
     <string name="blocking_keywords_add">Add keyword</string>
-    <string name="blocking_keywords_remove">Remove selected</string>
+    <string name="blocking_keywords_remove">Remove keyword</string>
+    <string name="blocking_keywords_empty">No blocked keywords</string>
     <string name="blocking_keywords_hint">Word or phrase</string>
     <string name="blocking_keywords_save">Save</string>
     <string name="blocking_keywords_contacts_title">Exclude contacts from keyword blocking</string>
