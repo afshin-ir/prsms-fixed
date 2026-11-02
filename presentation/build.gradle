@@ -52,8 +52,8 @@ android {
         applicationId "com.freetux.PRSMS"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 2221
-        versionName "0.1.2"
+        versionCode 2222
+        versionName "1.0.0"
         setProperty("archivesBaseName", "PRSMS-v${versionName}")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
