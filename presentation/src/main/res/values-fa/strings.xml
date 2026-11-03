@@ -303,6 +303,9 @@
     <string name="blocked_numbers_dialog_hint">شماره تلفن</string>
     <string name="blocked_numbers_dialog_block">مسدود کردن</string>
     <string name="blocked_messages_title">پیام‌های مسدود شده</string>
+    <string name="blocked_messages_summary">(%1$s پیامک از %2$s فرستنده)</string>
+    <string name="blocked_messages_sender_count">%1$s (%2$s پیامک)</string>
+    <string name="blocked_numbers_summary">(%1$s شماره)</string>
     <string name="blocked_messages_empty">پیامهای مسدود شده شما در اینجا ظاهر می شوند</string>
     <string name="blocking_block_title">مسدود کردن</string>
     <string name="blocking_unblock_title">رفع مسدوديت</string>
