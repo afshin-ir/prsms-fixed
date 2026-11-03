@@ -24,6 +24,8 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.provider.Telephony.Mms
+import android.provider.Telephony.Sms
 import com.freetux.PRSMS.R
 import com.freetux.PRSMS.common.base.QkController
 import com.freetux.PRSMS.common.util.Colors
@@ -125,6 +127,17 @@ class BlockedMessagesController : QkController<BlockedMessagesView, BlockedMessa
             conversations.fold(0L) { count, conversation ->
                 count + realm.where(Message::class.java)
                         .equalTo("threadId", conversation.id)
+                        .beginGroup()
+                        .beginGroup()
+                        .equalTo("type", "sms")
+                        .`in`("boxId", arrayOf(Sms.MESSAGE_TYPE_INBOX, Sms.MESSAGE_TYPE_ALL))
+                        .endGroup()
+                        .or()
+                        .beginGroup()
+                        .equalTo("type", "mms")
+                        .`in`("boxId", arrayOf(Mms.MESSAGE_BOX_INBOX, Mms.MESSAGE_BOX_ALL))
+                        .endGroup()
+                        .endGroup()
                         .count()
             }
         }
