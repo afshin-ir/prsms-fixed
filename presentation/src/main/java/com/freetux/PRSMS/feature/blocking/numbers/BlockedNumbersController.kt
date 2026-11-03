@@ -28,6 +28,9 @@ import com.freetux.PRSMS.common.util.Colors
 import com.freetux.PRSMS.common.util.extensions.setBackgroundTint
 import com.freetux.PRSMS.common.util.extensions.setTint
 import com.freetux.PRSMS.injection.appComponent
+import com.freetux.PRSMS.model.BlockedNumber
+import com.freetux.PRSMS.common.util.extensions.toPersianDigits
+import io.realm.RealmResults
 import com.freetux.PRSMS.util.PhoneNumberUtils
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -42,6 +45,9 @@ class BlockedNumbersController : QkController<BlockedNumbersView, BlockedNumbers
     @Inject override lateinit var presenter: BlockedNumbersPresenter
     @Inject lateinit var colors: Colors
     @Inject lateinit var phoneNumberUtils: PhoneNumberUtils
+
+    private var observedNumbers: RealmResults<BlockedNumber>? = null
+    private val blockedNumbersListener: (RealmResults<BlockedNumber>) -> Unit = { updateCountSummary(it) }
 
     private val adapter = BlockedNumbersAdapter()
     private val saveAddressSubject: Subject<String> = PublishSubject.create()
@@ -69,6 +75,26 @@ class BlockedNumbersController : QkController<BlockedNumbersView, BlockedNumbers
 
     override fun render(state: BlockedNumbersState) {
         adapter.updateData(state.numbers)
+        if (observedNumbers !== state.numbers) {
+            observedNumbers?.removeChangeListener(blockedNumbersListener)
+            observedNumbers = state.numbers
+            observedNumbers?.addChangeListener(blockedNumbersListener)
+        }
+        state.numbers?.let(::updateCountSummary)
+    }
+
+    private fun updateCountSummary(numbers: RealmResults<BlockedNumber>) {
+        if (!numbers.isLoaded || !numbers.isValid) return
+        summary.text = resources?.getString(
+                R.string.blocked_numbers_summary,
+                numbers.size.toLong().toPersianDigits()
+        )
+    }
+
+    override fun onDestroyView(view: View) {
+        observedNumbers?.removeChangeListener(blockedNumbersListener)
+        observedNumbers = null
+        super.onDestroyView(view)
     }
 
     override fun unblockAddress(): Observable<Long> = adapter.unblockAddress

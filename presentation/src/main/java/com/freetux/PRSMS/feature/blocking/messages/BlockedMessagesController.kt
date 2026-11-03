@@ -24,11 +24,18 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.provider.Telephony.Mms
+import android.provider.Telephony.Sms
 import com.freetux.PRSMS.R
 import com.freetux.PRSMS.common.base.QkController
 import com.freetux.PRSMS.common.util.Colors
 import com.freetux.PRSMS.feature.blocking.BlockingDialog
 import com.freetux.PRSMS.injection.appComponent
+import com.freetux.PRSMS.model.Conversation
+import com.freetux.PRSMS.model.Message
+import com.freetux.PRSMS.common.util.extensions.toPersianDigits
+import io.realm.Realm
+import io.realm.RealmResults
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import kotlinx.android.synthetic.main.blocked_messages_controller.*
@@ -37,6 +44,9 @@ import javax.inject.Inject
 
 class BlockedMessagesController : QkController<BlockedMessagesView, BlockedMessagesState, BlockedMessagesPresenter>(),
     BlockedMessagesView {
+
+    private var observedConversations: RealmResults<Conversation>? = null
+    private val blockedConversationsListener: (RealmResults<Conversation>) -> Unit = { updateCountSummary(it) }
 
     override val menuReadyIntent: Subject<Unit> = PublishSubject.create()
     override val optionsItemIntent: Subject<Int> = PublishSubject.create()
@@ -89,6 +99,12 @@ class BlockedMessagesController : QkController<BlockedMessagesView, BlockedMessa
 
     override fun render(state: BlockedMessagesState) {
         blockedMessagesAdapter.updateData(state.data)
+        if (observedConversations !== state.data) {
+            observedConversations?.removeChangeListener(blockedConversationsListener)
+            observedConversations = state.data
+            observedConversations?.addChangeListener(blockedConversationsListener)
+        }
+        state.data?.let(::updateCountSummary)
 
         themedActivity?.toolbar?.menu?.findItem(R.id.block)?.isVisible = state.selected > 0
         themedActivity?.toolbar?.menu?.findItem(R.id.delete)?.isVisible = state.selected > 0
@@ -97,6 +113,46 @@ class BlockedMessagesController : QkController<BlockedMessagesView, BlockedMessa
             0 -> context.getString(R.string.blocked_messages_title)
             else -> context.getString(R.string.main_title_selected, state.selected)
         })
+    }
+
+    private fun updateCountSummary(conversations: RealmResults<Conversation>) {
+        if (!conversations.isLoaded || !conversations.isValid) return
+
+        val senderCount = conversations
+                .flatMap { conversation -> conversation.recipients.map { recipient -> recipient.address } }
+                .filter { address -> address.isNotBlank() }
+                .distinct()
+                .size
+        val messageCount = Realm.getDefaultInstance().use { realm ->
+            conversations.fold(0L) { count, conversation ->
+                count + realm.where(Message::class.java)
+                        .equalTo("threadId", conversation.id)
+                        .beginGroup()
+                        .beginGroup()
+                        .equalTo("type", "sms")
+                        .`in`("boxId", arrayOf(Sms.MESSAGE_TYPE_INBOX, Sms.MESSAGE_TYPE_ALL))
+                        .endGroup()
+                        .or()
+                        .beginGroup()
+                        .equalTo("type", "mms")
+                        .`in`("boxId", arrayOf(Mms.MESSAGE_BOX_INBOX, Mms.MESSAGE_BOX_ALL))
+                        .endGroup()
+                        .endGroup()
+                        .count()
+            }
+        }
+
+        summary.text = resources?.getString(
+                R.string.blocked_messages_summary,
+                messageCount.toPersianDigits(),
+                senderCount.toPersianDigits()
+        )
+    }
+
+    override fun onDestroyView(view: View) {
+        observedConversations?.removeChangeListener(blockedConversationsListener)
+        observedConversations = null
+        super.onDestroyView(view)
     }
 
     override fun clearSelection() = blockedMessagesAdapter.clearSelection()

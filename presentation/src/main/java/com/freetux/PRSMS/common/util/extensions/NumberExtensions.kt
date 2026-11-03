@@ -22,6 +22,11 @@ import android.content.Context
 import android.graphics.Color
 import android.util.TypedValue
 
+fun Number.toPersianDigits(): String {
+    val digits = charArrayOf('۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹')
+    return toString().map { char -> if (char in '0'..'9') digits[char - '0'] else char }.joinToString("")
+}
+
 fun Int.dpToPx(context: Context): Int {
     return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.resources.displayMetrics).toInt()
 }
