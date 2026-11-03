@@ -29,6 +29,9 @@ import com.freetux.PRSMS.common.base.QkViewHolder
 import com.freetux.PRSMS.common.util.DateFormatter
 import com.freetux.PRSMS.common.util.extensions.resolveThemeColor
 import com.freetux.PRSMS.model.Conversation
+import com.freetux.PRSMS.model.Message
+import io.realm.Realm
+import com.freetux.PRSMS.common.util.extensions.toPersianDigits
 import com.freetux.PRSMS.util.Preferences
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.blocked_list_item.*
@@ -75,7 +78,16 @@ class BlockedMessagesAdapter @Inject constructor(
 
         holder.avatars.recipients = conversation.recipients
         holder.title.collapseEnabled = conversation.recipients.size > 1
-        holder.title.text = conversation.getTitle()
+        val messageCount = Realm.getDefaultInstance().use { realm ->
+            realm.where(Message::class.java)
+                    .equalTo("threadId", conversation.id)
+                    .count()
+        }
+        holder.title.text = context.getString(
+                R.string.blocked_messages_sender_count,
+                conversation.getTitle(),
+                messageCount.toPersianDigits()
+        )
         holder.date.text = dateFormatter.getConversationTimestamp(conversation.date)
 
         holder.blocker.text = when (conversation.blockingClient) {
