@@ -22,6 +22,8 @@ import android.content.Context
 import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.provider.Telephony.Mms
+import android.provider.Telephony.Sms
 import androidx.core.view.isVisible
 import com.freetux.PRSMS.R
 import com.freetux.PRSMS.common.base.QkRealmAdapter
@@ -81,6 +83,17 @@ class BlockedMessagesAdapter @Inject constructor(
         val messageCount = Realm.getDefaultInstance().use { realm ->
             realm.where(Message::class.java)
                     .equalTo("threadId", conversation.id)
+                    .beginGroup()
+                    .beginGroup()
+                    .equalTo("type", "sms")
+                    .`in`("boxId", arrayOf(Sms.MESSAGE_TYPE_INBOX, Sms.MESSAGE_TYPE_ALL))
+                    .endGroup()
+                    .or()
+                    .beginGroup()
+                    .equalTo("type", "mms")
+                    .`in`("boxId", arrayOf(Mms.MESSAGE_BOX_INBOX, Mms.MESSAGE_BOX_ALL))
+                    .endGroup()
+                    .endGroup()
                     .count()
         }
         holder.title.text = context.getString(
