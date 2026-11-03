@@ -132,14 +132,14 @@
     <string name="message_status_failed">ارسال ناموفق بود. برای تلاش دوباره ضربه بزنید</string>
     <string name="info_title">جزئیات</string>
     <string name="info_copied_address">نشانی کپی شد</string>
-    <string name="info_name">عنوان گفتگو</string>
+    <string name="info_name">نام فرستنده</string>
     <string name="info_notifications">اعلان‌ها</string>
     <string name="info_theme">پوسته</string>
-    <string name="info_archive">بایگانی کن</string>
+    <string name="info_archive">بایگانی کردن</string>
     <string name="info_unarchive">بیرون آوردن از بایگانی</string>
     <string name="info_block">مسدود کردن</string>
     <string name="info_unblock">رفع مسدودیت</string>
-    <string name="info_delete">حذف گفتگو</string>
+    <string name="info_delete">حذف پیامک</string>
     <string name="gallery_error">نمی‌توان رسانه را بارگذاری کرد</string>
     <string name="gallery_toast_saved">در گالری ذخیره شد</string>
     <string name="backup_title">پشتیبان‌گیری و بازیابی</string>
