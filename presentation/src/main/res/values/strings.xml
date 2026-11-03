@@ -339,6 +339,9 @@
     <string name="blocked_numbers_dialog_block">Block</string>
 
     <string name="blocked_messages_title">Blocked messages</string>
+    <string name="blocked_messages_summary">(%1$s messages from %2$s senders)</string>
+    <string name="blocked_messages_sender_count">%1$s (%2$s messages)</string>
+    <string name="blocked_numbers_summary">(%1$s numbers)</string>
     <string name="blocked_messages_empty">Your blocked messages will appear here</string>
 
     <string name="blocking_block_title">Block</string>
