@@ -25,10 +25,22 @@
     android:background="?android:attr/windowBackground">
 
     <com.freetux.PRSMS.common.widget.QkTextView
+        android:id="@+id/summary"
+        style="@style/TextSecondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="24dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="8dp"
+        tools:text="(۲۳۴ پیامک از ۳۲ فرستنده)" />
+
+    <com.freetux.PRSMS.common.widget.QkTextView
         android:id="@+id/empty"
         style="@style/TextSecondary"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="48dp"
         android:gravity="center"
         android:padding="56dp"
         android:text="@string/blocked_messages_empty" />
@@ -37,6 +49,7 @@
         android:id="@+id/conversations"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="48dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
