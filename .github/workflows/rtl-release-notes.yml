@@ -1,0 +1,38 @@
+name: Set Persian release notes RTL
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/rtl-release-notes.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  set-rtl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Persian release descriptions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          gh api --paginate "repos/$REPOSITORY/releases?per_page=100" \
+            --jq '.[] | select(.body != null) | [.id, (.body | @base64)] | @tsv' |
+          while IFS=$'\t' read -r release_id encoded_body; do
+            body="$(printf '%s' "$encoded_body" | base64 --decode)"
+
+            if printf '%s' "$body" | grep -Pq '[\x{0600}-\x{06FF}]'; then
+              if [[ "$body" != *'dir="rtl"'* && "$body" != *"dir='rtl'"* ]]; then
+                rtl_body="$(printf '<div dir="rtl" align="right">\n\n%s\n\n</div>' "$body")"
+                gh api --method PATCH "repos/$REPOSITORY/releases/$release_id" \
+                  -f body="$rtl_body" >/dev/null
+              fi
+            fi
+          done
