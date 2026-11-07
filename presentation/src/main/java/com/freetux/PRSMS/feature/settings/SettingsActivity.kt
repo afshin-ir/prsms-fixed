@@ -24,6 +24,7 @@ import com.bluelinelabs.conductor.Router
 import com.bluelinelabs.conductor.RouterTransaction
 import com.freetux.PRSMS.R
 import com.freetux.PRSMS.common.base.QkThemedActivity
+import com.freetux.PRSMS.feature.settings.about.AboutController
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.container_activity.*
 
@@ -38,7 +39,12 @@ class SettingsActivity : QkThemedActivity() {
 
         router = Conductor.attachRouter(this, container, savedInstanceState)
         if (!router.hasRootController()) {
-            router.setRoot(RouterTransaction.with(SettingsController()))
+            val initialController = if (intent.getBooleanExtra("showAbout", false)) {
+                AboutController()
+            } else {
+                SettingsController()
+            }
+            router.setRoot(RouterTransaction.with(initialController))
         }
     }
 
