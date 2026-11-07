@@ -24,6 +24,8 @@ import com.freetux.PRSMS.BuildConfig
 import com.freetux.PRSMS.R
 import com.freetux.PRSMS.common.base.QkController
 import com.freetux.PRSMS.common.widget.PreferenceView
+import com.freetux.PRSMS.common.util.shamsicalendar.PersianDate
+import com.freetux.PRSMS.common.util.shamsicalendar.PersianDateFormat
 import com.freetux.PRSMS.injection.appComponent
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.about_controller.*
@@ -40,6 +42,11 @@ class AboutController : QkController<AboutView, Unit, AboutPresenter>(), AboutVi
 
     override fun onViewCreated() {
         version.summary = BuildConfig.VERSION_NAME
+        val jalaliYear = PersianDateFormat(
+            "Y",
+            PersianDateFormat.PersianDateNumberCharacter.FARSI
+        ).format(PersianDate())
+        copyright.summary = copyright.context.getString(R.string.about_copyright, jalaliYear)
     }
 
     override fun onAttach(view: View) {
