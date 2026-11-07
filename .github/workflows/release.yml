@@ -46,6 +46,10 @@ jobs:
           java-version: '8'
           distribution: temurin
 
+      - name: Install Android SDK 34
+        run: |
+          sdkmanager --install "platforms;android-34" "build-tools;34.0.0"
+
       - name: Read release version
         run: |
           RELEASE_TAG="$(tr -d '[:space:]' < .release-version)"
