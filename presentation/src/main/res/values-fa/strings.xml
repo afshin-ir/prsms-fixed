@@ -134,6 +134,7 @@
     <string name="info_title">جزئیات</string>
     <string name="info_copied_address">نشانی کپی شد</string>
     <string name="info_name">نام فرستنده</string>
+    <string name="info_photo">تصویر فرستنده</string>
     <string name="info_notifications">اعلان‌ها</string>
     <string name="info_theme">پوسته</string>
     <string name="info_archive">بایگانی کردن</string>

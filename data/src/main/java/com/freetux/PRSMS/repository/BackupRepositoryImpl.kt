@@ -41,6 +41,8 @@ import timber.log.Timber
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
+import java.io.FileOutputStream
+import android.util.Base64
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -98,7 +100,8 @@ class BackupRepositoryImpl @Inject constructor(
 
     data class BackupNamedConversation(
         val addresses: List<String> = listOf(),
-        val name: String = ""
+        val name: String = "",
+        val photo: String = ""
     )
 
     data class BackupMessage(
@@ -156,11 +159,14 @@ class BackupRepositoryImpl @Inject constructor(
                     }
             namedConversations = realm.where(Conversation::class.java)
                     .findAll()
-                    .filter { conversation -> conversation.name.isNotBlank() && conversation.recipients.isNotEmpty() }
+                    .filter { conversation -> (conversation.name.isNotBlank() || conversation.photo.isNotBlank()) && conversation.recipients.isNotEmpty() }
                     .map { conversation ->
                         BackupNamedConversation(
                                 addresses = conversation.recipients.map { it.address },
-                                name = conversation.name
+                                name = conversation.name,
+                                photo = conversation.photo.takeIf { it.isNotBlank() }
+                                        ?.let { path -> File(context.filesDir, path).takeIf { it.isFile } }
+                                        ?.let { file -> Base64.encodeToString(file.readBytes(), Base64.NO_WRAP) }.orEmpty()
                         )
                     }
 
@@ -517,13 +523,24 @@ class BackupRepositoryImpl @Inject constructor(
 
         // Restore custom conversation titles using recipient addresses, since thread IDs may differ on another device.
         backup?.namedConversations?.forEach { namedConversation ->
-            if (namedConversation.addresses.isNotEmpty() && namedConversation.name.isNotBlank()) {
+            if (namedConversation.addresses.isNotEmpty()) {
                 try {
                     conversationRepo.getThreadId(namedConversation.addresses)?.let { threadId ->
-                        conversationRepo.setConversationName(threadId, namedConversation.name)
+                        if (namedConversation.name.isNotBlank()) {
+                            conversationRepo.setConversationName(threadId, namedConversation.name)
+                        }
+                        if (namedConversation.photo.isNotBlank()) {
+                            val relativePath = "sender_photos/$threadId.jpg"
+                            val photoFile = File(context.filesDir, relativePath)
+                            photoFile.parentFile?.mkdirs()
+                            FileOutputStream(photoFile).use { output ->
+                                output.write(Base64.decode(namedConversation.photo, Base64.DEFAULT))
+                            }
+                            conversationRepo.setConversationPhoto(threadId, relativePath)
+                        }
                     }
                 } catch (e: Exception) {
-                    Timber.w(e, "Unable to restore a conversation title")
+                    Timber.w(e, "Unable to restore a conversation title or photo")
                 }
             }
         }

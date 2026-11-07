@@ -37,6 +37,8 @@ interface ConversationRepository {
 
     fun setConversationName(id: Long, name: String)
 
+    fun setConversationPhoto(id: Long, photo: String)
+
     fun searchConversations(query: CharSequence): List<SearchResult>
 
     fun getBlockedConversations(): RealmResults<Conversation>

@@ -18,6 +18,8 @@
  */
 package com.freetux.PRSMS.feature.conversationinfo
 
+import android.content.Intent
+import android.net.Uri
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
@@ -55,6 +57,7 @@ class ConversationInfoController(
 
     private val nameChangeSubject: Subject<String> = PublishSubject.create()
     private val confirmDeleteSubject: Subject<Unit> = PublishSubject.create()
+    private val photoChangeSubject: Subject<String> = PublishSubject.create()
 
     init {
         appComponent
@@ -101,6 +104,9 @@ class ConversationInfoController(
     override fun themeClicks(): Observable<Long> = adapter.themeClicks
     override fun nameClicks(): Observable<*> = adapter.nameClicks
     override fun nameChanges(): Observable<String> = nameChangeSubject
+    override fun photoClicks(): Observable<*> = adapter.photoClicks
+    override fun photoChanges(): Observable<String> = photoChangeSubject
+    override fun requestSenderPhotoPicker() = openPhotoPicker()
     override fun notificationClicks(): Observable<*> = adapter.notificationClicks
     override fun archiveClicks(): Observable<*> = adapter.archiveClicks
     override fun blockClicks(): Observable<*> = adapter.blockClicks
@@ -109,6 +115,21 @@ class ConversationInfoController(
     override fun mediaClicks(): Observable<Long> = adapter.mediaClicks
 
     override fun showNameDialog(name: String) = nameDialog.setText(name).show()
+
+    private fun openPhotoPicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "image/*"
+        }
+        startActivityForResult(intent, PHOTO_REQUEST_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PHOTO_REQUEST_CODE && resultCode == android.app.Activity.RESULT_OK) {
+            data?.data?.let { photoChangeSubject.onNext(it.toString()) }
+        }
+    }
 
     override fun showThemePicker(recipientId: Long) {
         router.pushController(RouterTransaction.with(ThemePickerController(recipientId))
@@ -131,6 +152,10 @@ class ConversationInfoController(
                 .setPositiveButton(R.string.button_delete) { _, _ -> confirmDeleteSubject.onNext(Unit) }
                 .setNegativeButton(R.string.button_cancel, null)
                 .show()
+    }
+
+    companion object {
+        private const val PHOTO_REQUEST_CODE = 8042
     }
 
 }

@@ -104,6 +104,7 @@ class ConversationsAdapter @Inject constructor(
         holder.containerView.isActivated = isSelected(conversation.id)
 
         holder.avatars.recipients = conversation.recipients
+        holder.avatars.setCustomPhoto(conversation.photo)
         holder.title.collapseEnabled = conversation.recipients.size > 1
         holder.title.text = buildSpannedString {
             append(conversation.getTitle())
