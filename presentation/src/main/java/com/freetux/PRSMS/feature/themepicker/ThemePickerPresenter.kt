@@ -18,6 +18,7 @@
  */
 package com.freetux.PRSMS.feature.themepicker
 
+import android.util.Log
 import com.f2prateek.rx.preferences2.Preference
 import com.freetux.PRSMS.common.Navigator
 import com.freetux.PRSMS.common.base.QkPresenter
@@ -56,7 +57,7 @@ class ThemePickerPresenter @Inject constructor(
                 .subscribe { color ->
                     theme.set(color)
                     if (recipientId == 0L) {
-                        widgetManager.updateTheme()
+                        updateWidgetThemeSafely()
                     }
                 }
 
@@ -99,6 +100,17 @@ class ThemePickerPresenter @Inject constructor(
                 .withLatestFrom(theme.asObservable()) { _, color -> color }
                 .autoDisposable(view.scope())
                 .subscribe { color -> view.setCurrentTheme(color) }
+    }
+
+    /**
+     * A widget refresh is best-effort; it must not undo a theme selection that was already saved.
+     */
+    private fun updateWidgetThemeSafely() {
+        try {
+            widgetManager.updateTheme()
+        } catch (exception: RuntimeException) {
+            Log.w("ThemePickerPresenter", "Could not refresh the widget after changing the theme", exception)
+        }
     }
 
 }
