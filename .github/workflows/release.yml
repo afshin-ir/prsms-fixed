@@ -95,7 +95,7 @@ jobs:
           else
             gh release create "$RELEASE_TAG" "$APK_PATH" \
               --title "پیامک $RELEASE_TAG" \
-              --notes "نسخهٔ سازگار با Target SDK 34 برای انتشار در کافه‌بازار." \
+              --notes "<div dir=\"rtl\" align=\"right\">\n\nنسخهٔ سازگار با Target SDK 34 برای انتشار در کافه‌بازار.\n\n</div>" \
               --target "$GITHUB_SHA"
           fi
 
