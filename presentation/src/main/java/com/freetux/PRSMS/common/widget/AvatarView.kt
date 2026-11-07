@@ -19,6 +19,7 @@
 package com.freetux.PRSMS.common.widget
 
 import android.content.Context
+import java.io.File
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
@@ -43,6 +44,7 @@ class AvatarView @JvmOverloads constructor(
     private var lookupKey: String? = null
     private var fullName: String? = null
     private var photoUri: String? = null
+    private var customPhoto: File? = null
     private var lastUpdated: Long? = null
     private var theme: Colors.Theme
 
@@ -67,6 +69,12 @@ class AvatarView @JvmOverloads constructor(
         photoUri = recipient?.contact?.photoUri
         lastUpdated = recipient?.contact?.lastUpdate
         theme = colors.theme(recipient)
+        updateView()
+    }
+
+    fun setCustomPhoto(relativePath: String?) {
+        customPhoto = relativePath?.takeIf { it.isNotBlank() }?.let { File(context.filesDir, it) }
+                ?.takeIf { it.isFile }
         updateView()
     }
 
@@ -101,9 +109,10 @@ class AvatarView @JvmOverloads constructor(
         }
 
         photo.setImageDrawable(null)
-        photoUri?.let { photoUri ->
+        val image = customPhoto?.takeIf { it.isFile } ?: photoUri
+        image?.let { photoSource ->
             GlideApp.with(photo)
-                    .load(photoUri)
+                    .load(photoSource)
                     .into(photo)
         }
     }
