@@ -24,6 +24,9 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <!-- Used for starting foreground service for backup/restore on Android P+ -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_SMS" />
@@ -53,6 +56,7 @@
 
         <activity
             android:name="com.freetux.PRSMS.feature.main.MainActivity"
+            android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -64,6 +68,7 @@
         </activity>
         <activity
             android:name="com.freetux.PRSMS.feature.compose.ComposeActivity"
+            android:exported="true"
             android:parentActivityName="com.freetux.PRSMS.feature.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -123,7 +128,7 @@
         <activity android:name="com.freetux.PRSMS.feature.backup.BackupActivity" />
         <activity android:name="com.freetux.PRSMS.feature.contacts.ContactsActivity" />
 
-        <receiver android:name="com.freetux.PRSMS.receiver.BootReceiver">
+        <receiver android:name="com.freetux.PRSMS.receiver.BootReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -131,7 +136,7 @@
         <receiver
             android:name="com.freetux.PRSMS.receiver.AutomaticBackupReceiver"
             android:exported="false" />
-        <receiver android:name="com.freetux.PRSMS.receiver.DefaultSmsChangedReceiver">
+        <receiver android:name="com.freetux.PRSMS.receiver.DefaultSmsChangedReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.provider.action.DEFAULT_SMS_PACKAGE_CHANGED" />
             </intent-filter>
@@ -139,6 +144,7 @@
         <receiver android:name="com.freetux.PRSMS.receiver.DeleteMessagesReceiver" />
         <receiver
             android:name="com.freetux.PRSMS.receiver.SmsReceiver"
+            android:exported="true"
             android:permission="android.permission.BROADCAST_SMS">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_DELIVER" />
@@ -146,6 +152,7 @@
         </receiver>
         <receiver
             android:name="com.freetux.PRSMS.receiver.MmsReceiver"
+            android:exported="true"
             android:permission="android.permission.BROADCAST_WAP_PUSH">
             <intent-filter>
                 <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
@@ -169,13 +176,13 @@
         <receiver android:name="com.freetux.PRSMS.receiver.MarkReadReceiver" />
         <receiver android:name="com.freetux.PRSMS.receiver.RemoteMessagingReceiver" />
         <receiver android:name="com.freetux.PRSMS.receiver.NightModeReceiver" />
-        <receiver android:name="com.freetux.PRSMS.receiver.SmsProviderChangedReceiver">
+        <receiver android:name="com.freetux.PRSMS.receiver.SmsProviderChangedReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.provider.action.EXTERNAL_PROVIDER_CHANGE" />
             </intent-filter>
         </receiver>
         <receiver android:name="com.freetux.PRSMS.receiver.SendScheduledMessageReceiver" />
-        <receiver android:name="com.freetux.PRSMS.feature.widget.WidgetProvider">
+        <receiver android:name="com.freetux.PRSMS.feature.widget.WidgetProvider" android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.freetux.PRSMS.intent.action.ACTION_NOTIFY_DATASET_CHANGED" />
@@ -188,7 +195,9 @@
         <receiver android:name="com.freetux.PRSMS.receiver.SendSmsReceiver" />
 
         <service android:name="com.android.mms.transaction.TransactionService" />
-        <service android:name="com.freetux.PRSMS.feature.backup.RestoreBackupService" />
+        <service
+            android:name="com.freetux.PRSMS.feature.backup.RestoreBackupService"
+            android:foregroundServiceType="dataSync" />
         <service
             android:name="com.freetux.PRSMS.feature.widget.WidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
@@ -211,6 +220,7 @@
         </service>
         <service
             android:name="com.freetux.PRSMS.common.util.QkChooserTargetService"
+            android:exported="true"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_CHOOSER_TARGET_SERVICE">
             <intent-filter>
