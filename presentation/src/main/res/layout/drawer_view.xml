@@ -162,49 +162,22 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/plus"
+            android:id="@+id/about"
             style="@style/DrawerRow">
 
             <ImageView
                 style="@style/DrawerIcon"
-                android:src="@drawable/ic_star_black_24dp"
+                android:src="@drawable/ic_info_black_24dp"
                 android:tint="?android:attr/textColorSecondary" />
 
             <com.freetux.PRSMS.common.widget.QkTextView
                 style="@style/DrawerText"
-                android:text="@string/drawer_plus" />
+                android:text="@string/drawer_about" />
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/help"
-            style="@style/DrawerRow">
 
-            <ImageView
-                style="@style/DrawerIcon"
-                android:src="@drawable/ic_help_black_24dp"
-                android:tint="?android:attr/textColorSecondary" />
 
-            <com.freetux.PRSMS.common.widget.QkTextView
-                style="@style/DrawerText"
-                android:text="@string/drawer_help" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/invite"
-            style="@style/DrawerRow">
-
-            <ImageView
-                style="@style/DrawerIcon"
-                android:src="@drawable/ic_people_black_24dp"
-                android:tint="?android:attr/textColorSecondary" />
-
-            <com.freetux.PRSMS.common.widget.QkTextView
-                style="@style/DrawerText"
-                android:text="@string/drawer_invite" />
-
-        </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/plusBanner"
