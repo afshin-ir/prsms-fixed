@@ -76,6 +76,7 @@
     <string name="drawer_blocking">Blocking</string>
     <string name="drawer_more">More</string>
     <string name="drawer_settings">Settings</string>
+    <string name="drawer_about">About SMS</string>
     <string name="drawer_plus" translatable="false">PRSMS+</string>
     <string name="drawer_help">Help &amp; feedback</string>
     <string name="drawer_invite">Invite friends</string>
@@ -297,7 +298,7 @@
     <string name="settings_mms_size_title">Auto-compress MMS attachments</string>
     <string name="settings_sync_title">Sync messages</string>
     <string name="settings_sync_summary">Re-sync your messages with the native Android SMS database</string>
-    <string name="settings_about_title">About PRSMS</string>
+    <string name="settings_about_title">About SMS</string>
     <string name="settings_version">Version %s</string>
     <string name="settings_logging_enabled">Debug logging enabled</string>
     <string name="settings_logging_disabled">Debug logging disabled</string>
