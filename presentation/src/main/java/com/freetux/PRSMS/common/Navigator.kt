@@ -141,23 +141,29 @@ class Navigator @Inject constructor(
         startActivity(intent)
     }
 
+    fun showAbout() {
+        val intent = Intent(context, SettingsActivity::class.java)
+                .putExtra("showAbout", true)
+        startActivity(intent)
+    }
+
     fun showDeveloper() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/herotux"))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/afshin-ir"))
         startActivityExternal(intent)
     }
 
     fun showSourceCode() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/herotux/prsms"))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/afshin-ir/prsms-fixed"))
         startActivityExternal(intent)
     }
 
     fun showChangelog() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/herotux/prsms/releases"))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/afshin-ir/prsms-fixed/releases"))
         startActivityExternal(intent)
     }
 
     fun showLicense() {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/herotux/prsms/blob/main/LICENSE"))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/afshin-ir/prsms-fixed/blob/main/LICENSE"))
         startActivityExternal(intent)
     }
 
@@ -221,7 +227,7 @@ class Navigator @Inject constructor(
     fun showSupport() {
         val intent = Intent(Intent.ACTION_SENDTO)
         intent.data = Uri.parse("mailto:")
-        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("thefreetux@gmail.com"))
+        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("afshin@riseup.net"))
         intent.putExtra(Intent.EXTRA_SUBJECT, "PRSMS Support")
         intent.putExtra(Intent.EXTRA_TEXT, StringBuilder("\n\n")
                 .append("\n\n--- Please write your message above this line ---\n\n")
