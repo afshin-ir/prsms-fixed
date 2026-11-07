@@ -1,4 +1,4 @@
-name: Build and publish signed release APK
+name: Build and publish signed Vazirmatn APK
 
 on:
   workflow_dispatch:
