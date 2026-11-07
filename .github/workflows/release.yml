@@ -51,9 +51,9 @@ jobs:
         with:
           packages: platform-tools
 
-      - name: Install Android SDK 34
+      - name: Install Android SDK 34 and compatible build tools
         run: |
-          sdkmanager --install "platforms;android-34" "build-tools;34.0.0"
+          sdkmanager --install "platforms;android-34" "build-tools;30.0.3"
 
       - name: Set up JDK 8 for Gradle
         uses: actions/setup-java@v4
@@ -95,7 +95,7 @@ jobs:
           else
             gh release create "$RELEASE_TAG" "$APK_PATH" \
               --title "پیامک $RELEASE_TAG" \
-              --notes "شمار پیامک‌های مسدودشده و فرستندگان در فهرست انسداد نمایش داده می‌شود." \
+              --notes "نسخهٔ سازگار با Target SDK 34 برای انتشار در کافه‌بازار." \
               --target "$GITHUB_SHA"
           fi
 
