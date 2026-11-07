@@ -59,6 +59,7 @@ class HSVPickerView @JvmOverloads constructor(
 
         saturation.setOnTouchListener { _, event ->
             setupBounds()
+            if (max <= min) return@setOnTouchListener false
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     swatchX = event.x - event.rawX
@@ -87,6 +88,7 @@ class HSVPickerView @JvmOverloads constructor(
 
         hueGroup.setOnTouchListener { _, event ->
             setupBounds()
+            if (max <= min) return@setOnTouchListener false
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     hueThumbX = event.x - event.rawX
@@ -97,7 +99,7 @@ class HSVPickerView @JvmOverloads constructor(
                     val x = (event.rawX + hueThumbX + min).within(min, max)
 
                     hueThumb.x = x
-                    hue = (hueThumb.x - min) / (max - min) * 360
+                    hue = ((hueThumb.x - min) / (max - min) * 360).coerceIn(0f, 359.999f)
 
                     updateSelectedColor()
                 }
@@ -126,7 +128,12 @@ class HSVPickerView @JvmOverloads constructor(
         setupBounds()
 
         val range = max - min
-        val hsv = floatArrayOf(hue, (swatch.x - min) / range, 1 - (swatch.y - min) / range)
+        if (range <= 0f) return
+        val hsv = floatArrayOf(
+                hue.coerceIn(0f, 359.999f),
+                ((swatch.x - min) / range).coerceIn(0f, 1f),
+                (1 - (swatch.y - min) / range).coerceIn(0f, 1f)
+        )
         val color = Color.HSVToColor(hsv)
 
         swatch.setTint(color)
@@ -137,13 +144,14 @@ class HSVPickerView @JvmOverloads constructor(
         // Convert the rgb color to HSV
         val hsv = FloatArray(3).apply {
             Color.colorToHSV(color, this)
-            hue = this[0]
+            hue = this[0].coerceIn(0f, 359.999f)
         }
 
         // Set the position of the swatch
         post {
             setupBounds()
             val range = max - min
+            if (range <= 0f) return@post
 
             hueThumb.x = range * hsv[0] / 360 + min
             swatch.x = range * hsv[1] + min
