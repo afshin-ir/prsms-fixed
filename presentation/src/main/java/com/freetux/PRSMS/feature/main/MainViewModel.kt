@@ -137,7 +137,6 @@ class MainViewModel @Inject constructor(
 
         val permissions = view.activityResumedIntent
                 .filter { resumed -> resumed }
-                .observeOn(Schedulers.io())
                 .map { Triple(permissionManager.isDefaultSms(), permissionManager.hasReadSms(), permissionManager.hasContacts()) }
                 .distinctUntilChanged()
                 .share()
@@ -146,6 +145,9 @@ class MainViewModel @Inject constructor(
         permissions
                 .doOnNext { (defaultSms, smsPermission, contactPermission) ->
                     newState { copy(defaultSms = defaultSms, smsPermission = smsPermission, contactPermission = contactPermission) }
+                    if (defaultSms && smsPermission && contactPermission && !permissionManager.hasNotifications()) {
+                        view.requestPermissions()
+                    }
                 }
                 .autoDisposable(view.scope())
                 .subscribe()
