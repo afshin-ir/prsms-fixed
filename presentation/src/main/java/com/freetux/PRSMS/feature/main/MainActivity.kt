@@ -359,8 +359,12 @@ class MainActivity : QkThemedActivity(), MainView {
                 Manifest.permission.READ_SMS,
                 Manifest.permission.SEND_SMS,
                 Manifest.permission.READ_CONTACTS)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                !getPreferences(MODE_PRIVATE).getBoolean("notification_permission_requested", false)) {
             permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+            getPreferences(MODE_PRIVATE).edit()
+                    .putBoolean("notification_permission_requested", true)
+                    .apply()
         }
         ActivityCompat.requestPermissions(this, permissions.toTypedArray(), 0)
     }
