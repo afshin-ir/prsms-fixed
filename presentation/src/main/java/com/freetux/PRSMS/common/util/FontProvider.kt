@@ -29,26 +29,24 @@ import javax.inject.Singleton
 @Singleton
 class FontProvider @Inject constructor(context: Context) {
 
-    private var lato: Typeface? = null
+    private var vazirmatn: Typeface? = null
     private val pendingCallbacks = ArrayList<(Typeface) -> Unit>()
 
     init {
-        ResourcesCompat.getFont(context, R.font.lato, object : ResourcesCompat.FontCallback() {
+        ResourcesCompat.getFont(context, R.font.vazirmatn_regular, object : ResourcesCompat.FontCallback() {
             override fun onFontRetrievalFailed(reason: Int) {
-                Timber.w("Font retrieval failed: $reason")
+                Timber.w("Vazirmatn font retrieval failed: $reason")
             }
 
             override fun onFontRetrieved(typeface: Typeface) {
-                lato = typeface
-
-                pendingCallbacks.forEach { lato?.run(it) }
+                vazirmatn = typeface
+                pendingCallbacks.forEach { vazirmatn?.run(it) }
                 pendingCallbacks.clear()
             }
         }, null)
     }
 
-    fun getLato(callback: (Typeface) -> Unit) {
-        lato?.run(callback) ?: pendingCallbacks.add(callback)
+    fun getVazirmatn(callback: (Typeface) -> Unit) {
+        vazirmatn?.run(callback) ?: pendingCallbacks.add(callback)
     }
-
 }
