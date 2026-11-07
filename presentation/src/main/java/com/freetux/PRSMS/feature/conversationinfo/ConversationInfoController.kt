@@ -18,8 +18,6 @@
  */
 package com.freetux.PRSMS.feature.conversationinfo
 
-import android.content.Intent
-import android.net.Uri
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
@@ -106,7 +104,11 @@ class ConversationInfoController(
     override fun nameChanges(): Observable<String> = nameChangeSubject
     override fun photoClicks(): Observable<*> = adapter.photoClicks
     override fun photoChanges(): Observable<String> = photoChangeSubject
-    override fun requestSenderPhotoPicker() = openPhotoPicker()
+    override fun requestSenderPhotoPicker() {
+        (activity as? ConversationInfoActivity)?.chooseSenderPhoto { uri ->
+            photoChangeSubject.onNext(uri.toString())
+        }
+    }
     override fun notificationClicks(): Observable<*> = adapter.notificationClicks
     override fun archiveClicks(): Observable<*> = adapter.archiveClicks
     override fun blockClicks(): Observable<*> = adapter.blockClicks
@@ -115,21 +117,6 @@ class ConversationInfoController(
     override fun mediaClicks(): Observable<Long> = adapter.mediaClicks
 
     override fun showNameDialog(name: String) = nameDialog.setText(name).show()
-
-    private fun openPhotoPicker() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "image/*"
-        }
-        startActivityForResult(intent, PHOTO_REQUEST_CODE)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PHOTO_REQUEST_CODE && resultCode == android.app.Activity.RESULT_OK) {
-            data?.data?.let { photoChangeSubject.onNext(it.toString()) }
-        }
-    }
 
     override fun showThemePicker(recipientId: Long) {
         router.pushController(RouterTransaction.with(ThemePickerController(recipientId))
@@ -152,10 +139,6 @@ class ConversationInfoController(
                 .setPositiveButton(R.string.button_delete) { _, _ -> confirmDeleteSubject.onNext(Unit) }
                 .setNegativeButton(R.string.button_cancel, null)
                 .show()
-    }
-
-    companion object {
-        private const val PHOTO_REQUEST_CODE = 8042
     }
 
 }
