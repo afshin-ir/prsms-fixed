@@ -321,8 +321,8 @@
     <string name="about_version_title">نگارش</string>
     <string name="about_developer_title">توسعه دهنده</string>
     <string name="about_source_title">کد منبع</string>
-    <string name="about_changelog_title">گزارش دگرگونی‌</string>
-    <string name="about_contact_title">مخاطب</string>
+    <string name="about_changelog_title">آخرین به‌روزرسانی‌ها:</string>
+    <string name="about_contact_title">تماس با توسعه‌دهنده:</string>
     <string name="about_license_title">مجوز</string>
     <string name="about_copyright_title">حق نشر</string>
     <string name="qksms_plus_description_title">حمایت از تولید کننده،بازشدن همه چیز</string>
