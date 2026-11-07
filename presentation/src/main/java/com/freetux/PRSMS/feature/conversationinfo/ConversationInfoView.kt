@@ -28,9 +28,6 @@ interface ConversationInfoView : QkViewContract<ConversationInfoState> {
     fun themeClicks(): Observable<Long>
     fun nameClicks(): Observable<*>
     fun nameChanges(): Observable<String>
-    fun photoClicks(): Observable<*>
-    fun photoChanges(): Observable<String>
-    fun requestSenderPhotoPicker()
     fun notificationClicks(): Observable<*>
     fun archiveClicks(): Observable<*>
     fun blockClicks(): Observable<*>

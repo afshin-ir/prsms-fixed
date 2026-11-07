@@ -6,7 +6,7 @@ import io.realm.RealmList
 
 sealed class ConversationInfoItem {
 
-    data class ConversationInfoRecipient(val value: Recipient, val photo: String = "") : ConversationInfoItem()
+    data class ConversationInfoRecipient(val value: Recipient) : ConversationInfoItem()
 
     data class ConversationInfoSettings(
         val name: String,

@@ -58,8 +58,8 @@ android {
         applicationId "ir.afshin.prsms"
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 2256
-        versionName "1.0.34"
+        versionCode 2257
+        versionName "1.0.35"
         setProperty("archivesBaseName", "PRSMS-v${versionName}")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

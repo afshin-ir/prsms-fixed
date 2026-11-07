@@ -19,10 +19,6 @@
 package com.freetux.PRSMS.feature.conversationinfo
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import java.io.File
-import java.io.FileOutputStream
 import androidx.lifecycle.Lifecycle
 import com.freetux.PRSMS.R
 import com.freetux.PRSMS.common.Navigator
@@ -98,7 +94,7 @@ class ConversationInfoPresenter @Inject constructor(
                         return@combineLatest
                     }
 
-                    data += conversation.recipients.map { recipient -> ConversationInfoRecipient(recipient, conversation.photo) }
+                    data += conversation.recipients.map(::ConversationInfoRecipient)
                     data += ConversationInfoItem.ConversationInfoSettings(
                             name = conversation.name,
                             recipients = conversation.recipients,
@@ -109,37 +105,6 @@ class ConversationInfoPresenter @Inject constructor(
                     newState { copy(data = data) }
                 }
                 .subscribe()
-    }
-
-    private fun storeSenderPhoto(conversationId: Long, uri: String): String {
-        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        context.contentResolver.openInputStream(android.net.Uri.parse(uri))?.use { BitmapFactory.decodeStream(it, null, bounds) }
-        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) throw IllegalArgumentException("Invalid image")
-
-        var sampleSize = 1
-        while (bounds.outWidth / sampleSize > 1024 || bounds.outHeight / sampleSize > 1024) sampleSize *= 2
-        val options = BitmapFactory.Options().apply { inSampleSize = sampleSize }
-        val bitmap = context.contentResolver.openInputStream(android.net.Uri.parse(uri))?.use {
-            BitmapFactory.decodeStream(it, null, options)
-        } ?: throw IllegalArgumentException("Unable to open image")
-
-        val maxSize = 512
-        val scale = minOf(1f, maxSize.toFloat() / maxOf(bitmap.width, bitmap.height))
-        val resized = if (scale < 1f) Bitmap.createScaledBitmap(
-                bitmap,
-                (bitmap.width * scale).toInt().coerceAtLeast(1),
-                (bitmap.height * scale).toInt().coerceAtLeast(1),
-                true
-        ) else bitmap
-        val relativePath = "sender_photos/$conversationId.jpg"
-        val file = File(context.filesDir, relativePath)
-        file.parentFile?.mkdirs()
-        FileOutputStream(file).use { output ->
-            if (!resized.compress(Bitmap.CompressFormat.JPEG, 82, output)) throw IllegalStateException("Unable to encode image")
-        }
-        if (resized !== bitmap) resized.recycle()
-        bitmap.recycle()
-        return relativePath
     }
 
     override fun bindIntents(view: ConversationInfoView) {
@@ -189,33 +154,6 @@ class ConversationInfoPresenter @Inject constructor(
                 .subscribe(
                         { },
                         { error -> Timber.e(error, "Failed to save conversation title") }
-                )
-
-        // Choose a custom sender photo, stored inside the app and independent of phone contacts.
-        view.photoClicks()
-                .autoDisposable(view.scope())
-                .subscribe { view.requestSenderPhotoPicker() }
-
-        view.photoChanges()
-                .withLatestFrom(conversation) { uri, conversation -> conversation.id to uri }
-                .observeOn(Schedulers.io())
-                .map { (conversationId, uri) -> conversationId to storeSenderPhoto(conversationId, uri) }
-                .doOnNext { (conversationId, path) -> conversationRepo.setConversationPhoto(conversationId, path) }
-                .observeOn(AndroidSchedulers.mainThread())
-                .autoDisposable(view.scope())
-                .subscribe(
-                        { (_, path) ->
-                            newState {
-                                copy(data = data.map { item ->
-                                    if (item is ConversationInfoRecipient) item.copy(photo = path) else item
-                                })
-                            }
-                            context.makeToast(R.string.info_photo_saved)
-                        },
-                        { error ->
-                            Timber.e(error, "Failed to save sender photo")
-                            context.makeToast(R.string.info_photo_error)
-                        }
                 )
 
         // Show the notifications settings for the conversation
