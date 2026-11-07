@@ -74,7 +74,7 @@ class PlusActivity : QkThemedActivity(), PlusView {
         free.setVisible(false)
 
         if (!prefs.systemFont.get()) {
-            fontProvider.getLato { lato ->
+            fontProvider.getVazirmatn { lato ->
                 val typeface = Typeface.create(lato, Typeface.BOLD)
                 collapsingToolbar.setCollapsedTitleTypeface(typeface)
                 collapsingToolbar.setExpandedTitleTypeface(typeface)
