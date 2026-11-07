@@ -22,6 +22,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import com.freetux.PRSMS.manager.WidgetManager
 import com.freetux.PRSMS.receiver.NightModeReceiver
@@ -37,6 +38,8 @@ class NightModeManager @Inject constructor(
     private val prefs: Preferences,
     private val widgetManager: WidgetManager
 ) {
+
+    private val immutablePendingIntentFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
 
     fun updateCurrentTheme() {
         when (prefs.nightMode.get()) {
@@ -99,11 +102,11 @@ class NightModeManager @Inject constructor(
     private fun updateAlarms() {
         val dayCalendar = createCalendar(prefs.nightEnd.get())
         val day = Intent(context, NightModeReceiver::class.java)
-        val dayIntent = PendingIntent.getBroadcast(context, 0, day, 0)
+        val dayIntent = PendingIntent.getBroadcast(context, 0, day, immutablePendingIntentFlag)
 
         val nightCalendar = createCalendar(prefs.nightStart.get())
         val night = Intent(context, NightModeReceiver::class.java)
-        val nightIntent = PendingIntent.getBroadcast(context, 1, night, 0)
+        val nightIntent = PendingIntent.getBroadcast(context, 1, night, immutablePendingIntentFlag)
 
         context.sendBroadcast(day)
         context.sendBroadcast(night)
