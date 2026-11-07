@@ -19,7 +19,6 @@
 package com.freetux.PRSMS.feature.blocking
 
 data class BlockingState(
-    val blockingManager: String = "",
     val dropEnabled: Boolean = false,
     val excludeContactsFromKeywordBlocking: Boolean = true
 )

@@ -35,18 +35,6 @@ class BlockingPresenter @Inject constructor(
 ) : QkPresenter<BlockingView, BlockingState>(BlockingState()) {
 
     init {
-        disposables += prefs.blockingManager.asObservable()
-                .map { client ->
-                    when (client) {
-                        Preferences.BLOCKING_MANAGER_CB -> R.string.blocking_manager_call_blocker_title
-                        Preferences.BLOCKING_MANAGER_CC -> R.string.blocking_manager_call_control_title
-                        Preferences.BLOCKING_MANAGER_SIA -> R.string.blocking_manager_sia_title
-                        else -> R.string.blocking_manager_qksms_title
-                    }
-                }
-                .map(context::getString)
-                .subscribe { manager -> newState { copy(blockingManager = manager) } }
-
         disposables += prefs.drop.asObservable()
                 .subscribe { enabled -> newState { copy(dropEnabled = enabled) } }
 
@@ -56,10 +44,6 @@ class BlockingPresenter @Inject constructor(
 
     override fun bindIntents(view: BlockingView) {
         super.bindIntents(view)
-
-        view.blockingManagerIntent
-                .autoDisposable(view.scope())
-                .subscribe { view.openBlockingManager() }
 
         view.blockedNumbersIntent
                 .autoDisposable(view.scope())

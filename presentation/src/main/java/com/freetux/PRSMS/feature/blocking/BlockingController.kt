@@ -35,7 +35,6 @@ import com.freetux.PRSMS.common.QkChangeHandler
 import com.freetux.PRSMS.common.base.QkController
 import com.freetux.PRSMS.common.util.Colors
 import com.freetux.PRSMS.common.util.extensions.animateLayoutChanges
-import com.freetux.PRSMS.feature.blocking.manager.BlockingManagerController
 import com.freetux.PRSMS.feature.blocking.messages.BlockedMessagesController
 import com.freetux.PRSMS.feature.blocking.numbers.BlockedNumbersController
 import com.freetux.PRSMS.injection.appComponent
@@ -46,7 +45,6 @@ import javax.inject.Inject
 
 class BlockingController : QkController<BlockingView, BlockingState, BlockingPresenter>(), BlockingView {
 
-    override val blockingManagerIntent by lazy { blockingManager.clicks() }
     override val blockedNumbersIntent by lazy { blockedNumbers.clicks() }
     override val blockedMessagesIntent by lazy { blockedMessages.clicks() }
     override val blockedKeywordsIntent by lazy { blockedKeywords.clicks() }
@@ -77,7 +75,6 @@ class BlockingController : QkController<BlockingView, BlockingState, BlockingPre
     }
 
     override fun render(state: BlockingState) {
-        blockingManager.summary = state.blockingManager
         drop.checkbox.isChecked = state.dropEnabled
         keywordContacts.checkbox.isChecked = state.excludeContactsFromKeywordBlocking
         blockedMessages.isEnabled = !state.dropEnabled
@@ -218,12 +215,6 @@ class BlockingController : QkController<BlockingView, BlockingState, BlockingPre
             if (saved) onSaved?.invoke()
         }
         dialog.show()
-    }
-
-    override fun openBlockingManager() {
-        router.pushController(RouterTransaction.with(BlockingManagerController())
-                .pushChangeHandler(QkChangeHandler())
-                .popChangeHandler(QkChangeHandler()))
     }
 
 }
