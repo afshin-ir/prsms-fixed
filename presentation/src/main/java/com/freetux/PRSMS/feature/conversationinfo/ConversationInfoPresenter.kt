@@ -201,10 +201,21 @@ class ConversationInfoPresenter @Inject constructor(
                 .observeOn(Schedulers.io())
                 .map { (conversationId, uri) -> conversationId to storeSenderPhoto(conversationId, uri) }
                 .doOnNext { (conversationId, path) -> conversationRepo.setConversationPhoto(conversationId, path) }
+                .observeOn(AndroidSchedulers.mainThread())
                 .autoDisposable(view.scope())
                 .subscribe(
-                        { },
-                        { error -> Timber.e(error, "Failed to save sender photo") }
+                        { (_, path) ->
+                            newState {
+                                copy(data = data.map { item ->
+                                    if (item is ConversationInfoRecipient) item.copy(photo = path) else item
+                                })
+                            }
+                            context.makeToast(R.string.info_photo_saved)
+                        },
+                        { error ->
+                            Timber.e(error, "Failed to save sender photo")
+                            context.makeToast(R.string.info_photo_error)
+                        }
                 )
 
         // Show the notifications settings for the conversation
