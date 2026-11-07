@@ -367,6 +367,7 @@
     <string name="qkreply_menu_collapse">کمتر نمایش بده</string>
     <string name="qkreply_menu_view">بازکردن گفتگو</string>
     <string name="theme_material">متریال</string>
+    <string name="theme_plus">طیف رنگ‌ها</string>
     <string name="theme_hex">هگز</string>
     <string name="theme_apply">اعمال کردن</string>
     <string-array name="notification_actions">
