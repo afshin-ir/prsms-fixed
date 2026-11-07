@@ -37,7 +37,6 @@ data class SettingsState(
     val signature: String = "",
     val textSizeSummary: String = "",
     val textSizeId: Int = Preferences.TEXT_SIZE_NORMAL,
-    val systemFontEnabled: Boolean = true,
     val shamsiDateEnabled: Boolean = false,
     val splitSmsEnabled: Boolean = false,
     val stripUnicodeEnabled: Boolean = false,

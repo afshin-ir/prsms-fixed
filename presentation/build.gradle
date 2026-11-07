@@ -44,6 +44,12 @@ keystorePwd = keystorePwd ?: System.getenv("KEYSTORE_PASS")
 alias = alias ?: System.getenv("ALIAS_NAME")
 pwd = pwd ?: System.getenv("ALIAS_PASS")
 android {
+    sourceSets {
+        main {
+            res.srcDir("$buildDir/generated/vazirmatn-res")
+        }
+    }
+
     compileSdkVersion 34
     buildToolsVersion "30.0.3"
     flavorDimensions "analytics"
@@ -52,8 +58,8 @@ android {
         applicationId "ir.afshin.prsms"
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 2252
-        versionName "1.0.30"
+        versionCode 2253
+        versionName "1.0.31"
         setProperty("archivesBaseName", "PRSMS-v${versionName}")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -217,3 +223,19 @@ if (getGradle().getStartParameter().getTaskRequests().toString().contains("WithA
     apply plugin: 'com.google.gms.google-services'
     apply plugin: 'com.google.firebase.crashlytics'
 }
+
+// The font source is kept as base64 text for repository editing. Decode it into an Android
+// font resource before resource processing so all platform and custom views use the same font.
+def vazirmatnSource = file("font-src/vazirmatn_regular.b64")
+def generatedVazirmatnFont = file("$buildDir/generated/vazirmatn-res/font/vazirmatn_regular.ttf")
+
+task generateVazirmatnFont {
+    inputs.file vazirmatnSource
+    outputs.file generatedVazirmatnFont
+    doLast {
+        generatedVazirmatnFont.parentFile.mkdirs()
+        generatedVazirmatnFont.bytes = java.util.Base64.getMimeDecoder().decode(vazirmatnSource.getText("UTF-8"))
+    }
+}
+
+preBuild.dependsOn generateVazirmatnFont

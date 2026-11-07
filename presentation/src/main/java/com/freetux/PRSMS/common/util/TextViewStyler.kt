@@ -100,10 +100,8 @@ class TextViewStyler @Inject constructor(
         var colorAttr = 0
         var textSizeAttr = 0
 
-        if (!prefs.systemFont.get()) {
-            fontProvider.getLato { lato ->
-                textView.setTypeface(lato, textView.typeface?.style ?: Typeface.NORMAL)
-            }
+        fontProvider.getVazirmatn { vazirmatn ->
+            textView.setTypeface(vazirmatn, textView.typeface?.style ?: Typeface.NORMAL)
         }
 
         when (textView) {

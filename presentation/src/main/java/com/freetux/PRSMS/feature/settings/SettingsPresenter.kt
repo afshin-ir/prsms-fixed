@@ -112,9 +112,6 @@ class SettingsPresenter @Inject constructor(
         disposables += prefs.autoColor.asObservable()
                 .subscribe { autoColor -> newState { copy(autoColor = autoColor) } }
 
-        disposables += prefs.systemFont.asObservable()
-                .subscribe { enabled -> newState { copy(systemFontEnabled = enabled) } }
-        
         disposables += prefs.shamsiDate.asObservable()
                 .subscribe { enabled -> newState { copy(shamsiDateEnabled = enabled) } }
 
@@ -189,8 +186,6 @@ class SettingsPresenter @Inject constructor(
                             analytics.setUserProperty("Preference: Auto Color", !prefs.autoColor.get())
                             prefs.autoColor.set(!prefs.autoColor.get())
                         }
-
-                        R.id.systemFont -> prefs.systemFont.set(!prefs.systemFont.get())
 
                         R.id.shamsiDate -> prefs.shamsiDate.set(!prefs.shamsiDate.get())
 

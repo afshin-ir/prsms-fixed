@@ -22,6 +22,8 @@
     <style name="AppTheme" parent="AppBaseTheme" />
 
     <style name="AppBaseTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="fontFamily">@font/vazirmatn_regular</item>
+        <item name="android:fontFamily">@font/vazirmatn_regular</item>
         <item name="android:divider">@color/separatorDark</item>
         <item name="android:navigationBarColor">@color/backgroundDark</item>
         <item name="android:queryBackground">@color/bubbleDark</item>
@@ -44,6 +46,8 @@
     </style>
 
     <style name="AppThemeDialog" parent="Theme.AppCompat.Dialog">
+        <item name="fontFamily">@font/vazirmatn_regular</item>
+        <item name="android:fontFamily">@font/vazirmatn_regular</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
         <item name="android:textColorTertiary">@color/text_tertiary</item>
@@ -57,6 +61,8 @@
     </style>
 
     <style name="PopupTheme" parent="ThemeOverlay.AppCompat">
+        <item name="fontFamily">@font/vazirmatn_regular</item>
+        <item name="android:fontFamily">@font/vazirmatn_regular</item>
         <item name="android:colorBackground">@color/backgroundDark</item>
         <item name="android:textColor">@color/textPrimaryDark</item>
     </style>

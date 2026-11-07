@@ -26,6 +26,8 @@
     <attr name="switchTrackDisabled" format="color" />
 
     <style name="AppLaunchTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="fontFamily">@font/vazirmatn_regular</item>
+        <item name="android:fontFamily">@font/vazirmatn_regular</item>
         <item name="android:navigationBarColor">@color/backgroundDark</item>
         <item name="android:statusBarColor">@color/backgroundDark</item>
         <item name="android:windowBackground">@color/backgroundDark</item>
@@ -34,6 +36,8 @@
     <style name="AppTheme" parent="AppBaseTheme" />
 
     <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="fontFamily">@font/vazirmatn_regular</item>
+        <item name="android:fontFamily">@font/vazirmatn_regular</item>
         <item name="android:divider">@color/separatorLight</item>
         <item name="android:queryBackground">@color/bubbleLight</item>
         <item name="android:statusBarColor">@color/black</item>
@@ -55,6 +59,8 @@
     </style>
 
     <style name="AppThemeDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="fontFamily">@font/vazirmatn_regular</item>
+        <item name="android:fontFamily">@font/vazirmatn_regular</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
         <item name="android:textColorTertiary">@color/text_tertiary</item>
@@ -68,6 +74,8 @@
     </style>
 
     <style name="PopupTheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="fontFamily">@font/vazirmatn_regular</item>
+        <item name="android:fontFamily">@font/vazirmatn_regular</item>
         <item name="android:colorBackground">@color/backgroundLight</item>
         <item name="android:textColor">@color/textPrimary</item>
     </style>

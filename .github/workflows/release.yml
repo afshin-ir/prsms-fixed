@@ -86,16 +86,27 @@ jobs:
           test -n "$APK_PATH" || { echo "::error::Gradle did not produce a release APK"; exit 1; }
           echo "APK_PATH=$APK_PATH" >> "$GITHUB_ENV"
 
+      - name: Prepare RTL release notes
+        run: |
+          cat > "$RUNNER_TEMP/release-notes.md" <<'EOF'
+          <div dir="rtl" align="right">
+
+          نسخهٔ سازگار با Target SDK 34 برای انتشار در کافه‌بازار.
+
+          </div>
+          EOF
+
       - name: Create GitHub Release and attach APK
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             gh release upload "$RELEASE_TAG" "$APK_PATH" --clobber
+            gh release edit "$RELEASE_TAG" --notes-file "$RUNNER_TEMP/release-notes.md"
           else
             gh release create "$RELEASE_TAG" "$APK_PATH" \
               --title "پیامک $RELEASE_TAG" \
-              --notes "<div dir=\"rtl\" align=\"right\">\n\nنسخهٔ سازگار با Target SDK 34 برای انتشار در کافه‌بازار.\n\n</div>" \
+              --notes-file "$RUNNER_TEMP/release-notes.md" \
               --target "$GITHUB_SHA"
           fi
 
