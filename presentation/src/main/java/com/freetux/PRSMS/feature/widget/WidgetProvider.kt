@@ -26,6 +26,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.widget.RemoteViews
 import com.freetux.PRSMS.R
@@ -40,6 +41,9 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class WidgetProvider : AppWidgetProvider() {
+
+    private val immutablePendingIntentFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+    private val mutablePendingIntentFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
 
     @Inject lateinit var colors: Colors
     @Inject lateinit var prefs: Preferences
@@ -140,17 +144,17 @@ class WidgetProvider : AppWidgetProvider() {
 
         // Main intent
         val mainIntent = Intent(context, MainActivity::class.java)
-        val mainPI = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val mainPI = PendingIntent.getActivity(context, 0, mainIntent, PendingIntent.FLAG_UPDATE_CURRENT or immutablePendingIntentFlag)
         remoteViews.setOnClickPendingIntent(R.id.title, mainPI)
 
         // Compose intent
         val composeIntent = Intent(context, ComposeActivity::class.java)
-        val composePI = PendingIntent.getActivity(context, 0, composeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val composePI = PendingIntent.getActivity(context, 0, composeIntent, PendingIntent.FLAG_UPDATE_CURRENT or immutablePendingIntentFlag)
         remoteViews.setOnClickPendingIntent(R.id.compose, composePI)
 
         // Conversation intent
         val startActivityIntent = Intent(context, MainActivity::class.java)
-        val startActivityPendingIntent = PendingIntent.getActivity(context, 0, startActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val startActivityPendingIntent = PendingIntent.getActivity(context, 0, startActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT or mutablePendingIntentFlag)
         remoteViews.setPendingIntentTemplate(R.id.conversations, startActivityPendingIntent)
 
         AppWidgetManager.getInstance(context).updateAppWidget(appWidgetId, remoteViews)
