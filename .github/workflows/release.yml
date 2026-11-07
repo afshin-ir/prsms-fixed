@@ -46,6 +46,9 @@ jobs:
           java-version: '8'
           distribution: temurin
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Install Android SDK 34
         run: |
           sdkmanager --install "platforms;android-34" "build-tools;34.0.0"
