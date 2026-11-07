@@ -43,6 +43,7 @@ import javax.inject.Inject
 class WidgetProvider : AppWidgetProvider() {
 
     private val immutablePendingIntentFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+    private val mutablePendingIntentFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
 
     @Inject lateinit var colors: Colors
     @Inject lateinit var prefs: Preferences
@@ -153,7 +154,7 @@ class WidgetProvider : AppWidgetProvider() {
 
         // Conversation intent
         val startActivityIntent = Intent(context, MainActivity::class.java)
-        val startActivityPendingIntent = PendingIntent.getActivity(context, 0, startActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT or immutablePendingIntentFlag)
+        val startActivityPendingIntent = PendingIntent.getActivity(context, 0, startActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT or mutablePendingIntentFlag)
         remoteViews.setPendingIntentTemplate(R.id.conversations, startActivityPendingIntent)
 
         AppWidgetManager.getInstance(context).updateAppWidget(appWidgetId, remoteViews)
