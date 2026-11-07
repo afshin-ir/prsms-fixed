@@ -30,7 +30,6 @@ class ConversationInfoAdapter @Inject constructor(
     val recipientLongClicks: Subject<Long> = PublishSubject.create()
     val themeClicks: Subject<Long> = PublishSubject.create()
     val nameClicks: Subject<Unit> = PublishSubject.create()
-    val photoClicks: Subject<Unit> = PublishSubject.create()
     val notificationClicks: Subject<Unit> = PublishSubject.create()
     val archiveClicks: Subject<Unit> = PublishSubject.create()
     val blockClicks: Subject<Unit> = PublishSubject.create()
@@ -60,7 +59,6 @@ class ConversationInfoAdapter @Inject constructor(
 
             1 -> QkViewHolder(inflater.inflate(R.layout.conversation_info_settings, parent, false)).apply {
                 groupName.clicks().subscribe(nameClicks)
-                senderPhoto.clicks().subscribe(photoClicks)
                 notifications.clicks().subscribe(notificationClicks)
                 archive.clicks().subscribe(archiveClicks)
                 block.clicks().subscribe(blockClicks)
@@ -83,7 +81,6 @@ class ConversationInfoAdapter @Inject constructor(
             is ConversationInfoRecipient -> {
                 val recipient = item.value
                 holder.avatar.setRecipient(recipient)
-                holder.avatar.setCustomPhoto(item.photo)
 
                 holder.name.text = recipient.contact?.name ?: recipient.address
 
@@ -97,8 +94,6 @@ class ConversationInfoAdapter @Inject constructor(
             }
 
             is ConversationInfoSettings -> {
-                holder.senderPhoto.isVisible = item.recipients.size == 1
-                holder.senderPhoto.title = context.getString(R.string.info_photo)
                 holder.groupName.isVisible = true
                 holder.groupName.summary = item.name
 

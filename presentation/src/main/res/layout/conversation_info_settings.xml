@@ -38,13 +38,6 @@
         app:title="@string/info_name" />
 
     <com.freetux.PRSMS.common.widget.PreferenceView
-        android:id="@+id/senderPhoto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:icon="@drawable/ic_person_black_24dp"
-        app:title="@string/info_photo" />
-
-    <com.freetux.PRSMS.common.widget.PreferenceView
         android:id="@+id/notifications"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

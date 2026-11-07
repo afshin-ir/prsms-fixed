@@ -55,7 +55,6 @@ class ConversationInfoController(
 
     private val nameChangeSubject: Subject<String> = PublishSubject.create()
     private val confirmDeleteSubject: Subject<Unit> = PublishSubject.create()
-    private val photoChangeSubject: Subject<String> = PublishSubject.create()
 
     init {
         appComponent
@@ -102,13 +101,6 @@ class ConversationInfoController(
     override fun themeClicks(): Observable<Long> = adapter.themeClicks
     override fun nameClicks(): Observable<*> = adapter.nameClicks
     override fun nameChanges(): Observable<String> = nameChangeSubject
-    override fun photoClicks(): Observable<*> = adapter.photoClicks
-    override fun photoChanges(): Observable<String> = photoChangeSubject
-    override fun requestSenderPhotoPicker() {
-        (activity as? ConversationInfoActivity)?.chooseSenderPhoto { uri ->
-            photoChangeSubject.onNext(uri.toString())
-        }
-    }
     override fun notificationClicks(): Observable<*> = adapter.notificationClicks
     override fun archiveClicks(): Observable<*> = adapter.archiveClicks
     override fun blockClicks(): Observable<*> = adapter.blockClicks

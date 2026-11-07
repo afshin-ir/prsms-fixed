@@ -35,13 +35,6 @@ class GroupAvatarView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : ConstraintLayout(context, attrs) {
 
-    private var customPhoto: String = ""
-
-    fun setCustomPhoto(photo: String) {
-        customPhoto = photo
-        updateView()
-    }
-
     var recipients: List<Recipient> = ArrayList()
         set(value) {
             field = value.sortedWith(compareByDescending { contact -> contact.contact?.lookupKey })
@@ -72,7 +65,6 @@ class GroupAvatarView @JvmOverloads constructor(
 
 
         recipients.getOrNull(0).run(avatar1::setRecipient)
-        avatar1.setCustomPhoto(customPhoto.takeIf { recipients.size == 1 })
         recipients.getOrNull(1).run(avatar2::setRecipient)
     }
 

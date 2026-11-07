@@ -36,7 +36,7 @@ class QkRealmMigration @Inject constructor(
 ) : RealmMigration {
 
     companion object {
-        const val SchemaVersion: Long = 12
+        const val SchemaVersion: Long = 13
     }
 
     @SuppressLint("ApplySharedPref")
@@ -234,9 +234,16 @@ class QkRealmMigration @Inject constructor(
             version++
         }
 
+        // Remove the temporary sender-photo field introduced in v1.0.32.
+        // This keeps upgrades from v1.0.32–v1.0.34 compatible after removing that feature.
         if (version == 11L) {
             realm.schema.get("Conversation")
                     ?.addField("photo", String::class.java, FieldAttribute.REQUIRED)
+            version++
+        }
+
+        if (version == 12L) {
+            realm.schema.get("Conversation")?.removeField("photo")
             version++
         }
 
