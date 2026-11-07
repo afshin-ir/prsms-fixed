@@ -415,12 +415,12 @@
     <string name="theme_hex">HEX</string>
     <string name="theme_apply">Apply</string>
 
-    <string name="about_developer" translatable="false">Hamid seydy</string>
-    <string name="about_source" translatable="false">https://github.com/herotux/prsms</string>
-    <string name="about_changelog" translatable="false">https://github.com/herotux/prsms/releases</string>
-    <string name="about_contact" translatable="false">thefreetux@gmail.com</string>
+    <string name="about_developer" translatable="false">افشین فلاطونی</string>
+    <string name="about_source" translatable="false">https://github.com/afshin-ir/prsms-fixed</string>
+    <string name="about_changelog" translatable="false">https://github.com/afshin-ir/prsms-fixed/releases</string>
+    <string name="about_contact" translatable="false">afshin@riseup.net</string>
     <string name="about_license" translatable="false">GNU General Public License v3.0</string>
-    <string name="about_copyright" translatable="false">© 2022–2027</string>
+    <string name="about_copyright" translatable="false">© ۱۴۰۱–%1$s</string>
 
     <string name="changelog_title" translatable="false">New in PRSMS</string>
     <string name="changelog_version" translatable="false">Version %s</string>
