@@ -24,6 +24,7 @@ import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.graphics.BitmapFactory
 import android.media.MediaScannerConnection
 import android.os.Build
@@ -443,15 +444,21 @@ class MessageRepositoryImpl @Inject constructor(
                 .divideMessage(if (prefs.unicode.get()) StripAccents.stripAccents(message.body) else message.body)
                 ?: arrayListOf()
 
-        val sentIntents = parts.map {
-            val intent = Intent(context, SmsSentReceiver::class.java).putExtra("id", message.id)
-            PendingIntent.getBroadcast(context, message.id.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntentFlags = PendingIntent.FLAG_UPDATE_CURRENT or
+                (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0)
+
+        val sentIntents = parts.mapIndexed { partIndex, _ ->
+            val intent = Intent(context, SmsSentReceiver::class.java)
+                    .setData(Uri.parse("prsms://sms-sent/${message.id}/$partIndex"))
+                    .putExtra("id", message.id)
+            PendingIntent.getBroadcast(context, 0, intent, pendingIntentFlags)
         }
 
-        val deliveredIntents = parts.map {
-            val intent = Intent(context, SmsDeliveredReceiver::class.java).putExtra("id", message.id)
-            val pendingIntent = PendingIntent
-                    .getBroadcast(context, message.id.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val deliveredIntents = parts.mapIndexed { partIndex, _ ->
+            val intent = Intent(context, SmsDeliveredReceiver::class.java)
+                    .setData(Uri.parse("prsms://sms-delivered/${message.id}/$partIndex"))
+                    .putExtra("id", message.id)
+            val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, pendingIntentFlags)
             if (prefs.delivery.get()) pendingIntent else null
         }
 
